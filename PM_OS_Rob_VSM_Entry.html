@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PM OS: VSM Entry (3-Pass Approach)</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      background: #131414;
+      font-family: 'DM Sans', sans-serif;
+      color: #F2F2F2;
+    }
+    
+    .header {
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #2B2C2C;
+    }
+    .logo { font-size: 24px; font-weight: 700; }
+    .logo span { color: #FF0000; }
+    .back-link {
+      font-size: 13px;
+      color: #888;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .back-link:hover { color: #F2F2F2; }
+    
+    .main {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      min-height: calc(100vh - 60px);
+    }
+    
+    .form-panel {
+      padding: 32px;
+      border-right: 1px solid #2B2C2C;
+      overflow-y: auto;
+    }
+    
+    .preview-panel {
+      padding: 24px;
+      background: #0a0a0a;
+      overflow-y: auto;
+    }
+    
+    .page-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .page-subtitle {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 24px;
+    }
+    
+    /* Pass Tabs */
+    .pass-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      background: #1a1a1a;
+      padding: 6px;
+      border-radius: 12px;
+    }
+    .pass-tab {
+      flex: 1;
+      padding: 12px 16px;
+      border: none;
+      background: transparent;
+      color: #888;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .pass-tab:hover {
+      color: #F2F2F2;
+      background: #2B2C2C;
+    }
+    .pass-tab.active {
+      background: linear-gradient(135deg, #FF0000, #800031);
+      color: white;
+    }
+    .pass-tab .pass-number {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      opacity: 0.7;
+    }
+    .pass-tab .pass-name {
+      font-weight: 600;
+    }
+    
+    /* Progress Indicator */
+    .progress-bar {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+    }
+    .progress-segment {
+      flex: 1;
+      height: 4px;
+      background: #2B2C2C;
+      border-radius: 2px;
+    }
+    .progress-segment.complete {
+      background: #22c55e;
+    }
+    .progress-segment.current {
+      background: linear-gradient(90deg, #FF0000, #2B2C2C);
+    }
+    
+    /* Form Sections */
+    .form-section {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    .form-section.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .section-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .section-icon.pass1 { background: rgba(96, 165, 250, 0.15); }
+    .section-icon.pass2 { background: rgba(168, 85, 247, 0.15); }
+    .section-icon.pass3 { background: rgba(34, 197, 94, 0.15); }
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .section-desc {
+      font-size: 12px;
+      color: #888;
+    }
+    
+    /* Form Groups */
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: #CACACA;
+      margin-bottom: 8px;
+    }
+    .form-label .hint {
+      font-weight: 400;
+      color: #666;
+    }
+    
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 12px 16px;
+      background: #1a1a1a;
+      border: 1px solid #2B2C2C;
+      border-radius: 10px;
+      color: #F2F2F2;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      outline: none;
+      border-color: #FF0000;
+      box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.1);
+    }
+    .form-textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .form-row-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
+    
+    /* Waste Tags */
+    .waste-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .waste-tag {
+      padding: 8px 12px;
+      background: #1a1a1a;
+      border: 1px solid #2B2C2C;
+      border-radius: 8px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .waste-tag:hover {
+      border-color: #444;
+    }
+    .waste-tag.selected {
+      background: rgba(255, 0, 0, 0.1);
+      border-color: #FF0000;
+      color: #FF0000;
+    }
+    .waste-tag .waste-icon {
+      font-size: 14px;
+    }
+    
+    /* Classification Pills */
+    .classification-pills {
+      display: flex;
+      gap: 8px;
+    }
+    .class-pill {
+      flex: 1;
+      padding: 12px;
+      background: #1a1a1a;
+      border: 1px solid #2B2C2C;
+      border-radius: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .class-pill:hover {
+      border-color: #444;
+    }
+    .class-pill.selected.va {
+      background: rgba(34, 197, 94, 0.1);
+      border-color: #22c55e;
+    }
+    .class-pill.selected.nva {
+      background: rgba(255, 0, 0, 0.1);
+      border-color: #FF0000;
+    }
+    .class-pill.selected.rnva {
+      background: rgba(234, 179, 8, 0.1);
+      border-color: #eab308;
+    }
+    .class-pill .pill-label {
+      font-size: 11px;
+      color: #888;
+      margin-bottom: 4px;
+    }
+    .class-pill .pill-value {
+      font-size: 13px;
+      font-weight: 600;
+    }
+    
+    /* Stage List */
+    .stage-list {
+      margin-bottom: 20px;
+    }
+    .stage-item {
+      background: #1a1a1a;
+      border: 1px solid #2B2C2C;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .stage-number {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(96, 165, 250, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: #60a5fa;
+    }
+    .stage-info { flex: 1; }
+    .stage-name {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    .stage-meta {
+      font-size: 11px;
+      color: #888;
+    }
+    .stage-status {
+      display: flex;
+      gap: 8px;
+    }
+    .status-badge {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .status-badge.complete {
+      background: rgba(34, 197, 94, 0.15);
+      color: #22c55e;
+    }
+    .status-badge.partial {
+      background: rgba(234, 179, 8, 0.15);
+      color: #eab308;
+    }
+    .status-badge.empty {
+      background: rgba(255, 255, 255, 0.05);
+      color: #666;
+    }
+    
+    /* Navigation Buttons */
+    .nav-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid #2B2C2C;
+    }
+    .nav-btn {
+      flex: 1;
+      padding: 14px 24px;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .nav-btn.secondary {
+      background: #1a1a1a;
+      color: #888;
+      border: 1px solid #2B2C2C;
+    }
+    .nav-btn.secondary:hover {
+      background: #2B2C2C;
+      color: #F2F2F2;
+    }
+    .nav-btn.primary {
+      background: linear-gradient(78deg, #800031, #FF0000);
+      color: white;
+    }
+    .nav-btn.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+    }
+    
+    /* Preview Panel */
+    .preview-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #888;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .preview-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #2B2C2C;
+    }
+    
+    .preview-content {
+      background: #1a1a1a;
+      border: 1px solid #2B2C2C;
+      border-radius: 12px;
+      padding: 20px;
+      font-family: 'SF Mono', 'Monaco', monospace;
+      font-size: 11px;
+      line-height: 1.6;
+      color: #CACACA;
+      white-space: pre-wrap;
+      max-height: calc(100vh - 200px);
+      overflow-y: auto;
+    }
+    .preview-content .key {
+      color: #60a5fa;
+    }
+    .preview-content .value {
+      color: #22c55e;
+    }
+    .preview-content .section {
+      color: #a855f7;
+      font-weight: 600;
+    }
+    .preview-content .comment {
+      color: #666;
+    }
+    
+    /* Info Cards */
+    .info-card {
+      background: rgba(96, 165, 250, 0.05);
+      border: 1px solid rgba(96, 165, 250, 0.2);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .info-card-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .info-card-body {
+      font-size: 12px;
+      color: #CACACA;
+      line-height: 1.5;
+    }
+    
+    /* Add Stage Button */
+    .add-stage-btn {
+      width: 100%;
+      padding: 16px;
+      background: transparent;
+      border: 2px dashed #2B2C2C;
+      border-radius: 12px;
+      color: #666;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .add-stage-btn:hover {
+      border-color: #444;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="logo">PM <span>/</span> OS</div>
+    <a href="PM_OS_Rob_Welcome.html" class="back-link">← Back to Welcome</a>
+  </header>
+
+  <main class="main">
+    <div class="form-panel">
+      <h1 class="page-title">VSM Data Entry</h1>
+      <p class="page-subtitle">Rob's 3-Pass Approach: Capture value stream data in structured passes</p>
+      
+      <!-- Pass Tabs -->
+      <div class="pass-tabs">
+        <button class="pass-tab active" data-pass="1">
+          <span class="pass-number">First Pass</span>
+          <span class="pass-name">Value/Work Flow</span>
+        </button>
+        <button class="pass-tab" data-pass="2">
+          <span class="pass-number">Second Pass</span>
+          <span class="pass-name">Information Flow</span>
+        </button>
+        <button class="pass-tab" data-pass="3">
+          <span class="pass-number">Third Pass</span>
+          <span class="pass-name">Metrics</span>
+        </button>
+      </div>
+      
+      <!-- Progress Bar -->
+      <div class="progress-bar">
+        <div class="progress-segment current"></div>
+        <div class="progress-segment"></div>
+        <div class="progress-segment"></div>
+      </div>
+      
+      <!-- Pass 1: Value/Work Flow -->
+      <div class="form-section active" data-section="1">
+        <div class="section-header">
+          <div class="section-icon pass1">🔄</div>
+          <div>
+            <div class="section-title">First Pass: Value/Work Flow</div>
+            <div class="section-desc">Identify process stages, handoffs, and work classification</div>
+          </div>
+        </div>
+        
+        <div class="info-card">
+          <div class="info-card-title">💡 What to capture</div>
+          <div class="info-card-body">
+            Map the sequence of work from trigger to outcome. Focus on what happens, who does it, and whether it adds value. Don't worry about timing yet.
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Customer / Program <span class="hint">(e.g., 309th SWEG)</span></label>
+          <input type="text" class="form-input" id="customer" value="309th SWEG" placeholder="Enter customer name">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Value Stream Name</label>
+          <input type="text" class="form-input" id="vsm-name" value="Software Release Pipeline" placeholder="Enter value stream name">
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">State</label>
+            <select class="form-select" id="vsm-state">
+              <option value="current" selected>Current State</option>
+              <option value="target">Target State</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Capture Date</label>
+            <input type="date" class="form-input" id="capture-date" value="2025-12-19">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Stages <span class="hint">(Click to edit, or add new)</span></label>
+          <div class="stage-list">
+            <div class="stage-item">
+              <div class="stage-number">1</div>
+              <div class="stage-info">
+                <div class="stage-name">Requirements Intake</div>
+                <div class="stage-meta">PMO → Development Team</div>
+              </div>
+              <div class="stage-status">
+                <span class="status-badge complete">Pass 1 ✓</span>
+              </div>
+            </div>
+            <div class="stage-item">
+              <div class="stage-number">2</div>
+              <div class="stage-info">
+                <div class="stage-name">Technical Review</div>
+                <div class="stage-meta">Development Team → Architecture Board</div>
+              </div>
+              <div class="stage-status">
+                <span class="status-badge complete">Pass 1 ✓</span>
+              </div>
+            </div>
+            <div class="stage-item">
+              <div class="stage-number">3</div>
+              <div class="stage-info">
+                <div class="stage-name">ATO Review</div>
+                <div class="stage-meta">Security Team → AO</div>
+              </div>
+              <div class="stage-status">
+                <span class="status-badge partial">Bottleneck</span>
+              </div>
+            </div>
+            <div class="stage-item">
+              <div class="stage-number">4</div>
+              <div class="stage-info">
+                <div class="stage-name">Build & Test</div>
+                <div class="stage-meta">Development Team</div>
+              </div>
+              <div class="stage-status">
+                <span class="status-badge complete">Pass 1 ✓</span>
+              </div>
+            </div>
+            <div class="stage-item">
+              <div class="stage-number">5</div>
+              <div class="stage-info">
+                <div class="stage-name">Deploy to Prod</div>
+                <div class="stage-meta">Platform Team → Production</div>
+              </div>
+              <div class="stage-status">
+                <span class="status-badge complete">Pass 1 ✓</span>
+              </div>
+            </div>
+          </div>
+          <button class="add-stage-btn">+ Add Stage</button>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Work Classification (for selected stage)</label>
+          <div class="classification-pills">
+            <div class="class-pill selected va">
+              <div class="pill-label">Value-Add</div>
+              <div class="pill-value">VA</div>
+            </div>
+            <div class="class-pill nva">
+              <div class="pill-label">Non-Value-Add</div>
+              <div class="pill-value">NVA</div>
+            </div>
+            <div class="class-pill rnva">
+              <div class="pill-label">Required NVA</div>
+              <div class="pill-value">RNVA</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Wastes Identified <span class="hint">(8 Forms of Waste)</span></label>
+          <div class="waste-tags">
+            <div class="waste-tag selected"><span class="waste-icon">⏳</span> Waiting</div>
+            <div class="waste-tag"><span class="waste-icon">📦</span> Inventory</div>
+            <div class="waste-tag selected"><span class="waste-icon">🔄</span> Extra Processing</div>
+            <div class="waste-tag"><span class="waste-icon">🚚</span> Motion</div>
+            <div class="waste-tag"><span class="waste-icon">🔁</span> Transportation</div>
+            <div class="waste-tag"><span class="waste-icon">🐛</span> Defects</div>
+            <div class="waste-tag"><span class="waste-icon">📈</span> Overproduction</div>
+            <div class="waste-tag"><span class="waste-icon">🧠</span> Non-utilized Talent</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Pass 2: Information Flow -->
+      <div class="form-section" data-section="2">
+        <div class="section-header">
+          <div class="section-icon pass2">📡</div>
+          <div>
+            <div class="section-title">Second Pass: Information Flow</div>
+            <div class="section-desc">How does information move between stages?</div>
+          </div>
+        </div>
+        
+        <div class="info-card">
+          <div class="info-card-title">💡 What to capture</div>
+          <div class="info-card-body">
+            Trace how information triggers work and flows between stages. Identify push vs. pull, manual vs. automated, and where information gets stuck or lost.
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Information Trigger <span class="hint">(What starts this value stream?)</span></label>
+          <input type="text" class="form-input" value="Jira ticket created by PMO" placeholder="What triggers work to begin?">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Stage-to-Stage Information Flow</label>
+          <div class="stage-list">
+            <div class="stage-item">
+              <div class="stage-number">1→2</div>
+              <div class="stage-info">
+                <div class="stage-name">Requirements → Technical Review</div>
+                <div class="stage-meta">Email notification, manual handoff</div>
+              </div>
+              <div class="stage-status">
+                <span class="status-badge partial">Manual</span>
+              </div>
+            </div>
+            <div class="stage-item">
+              <div class="stage-number">2→3</div>
+              <div class="stage-info">
+                <div class="stage-name">Technical Review → ATO Review</div>
+                <div class="stage-meta">Sharepoint folder drop, no notification</div>
+              </div>
+              <div class="stage-status">
+                <span class="status-badge partial">Manual</span>
+              </div>
+            </div>
+            <div class="stage-item">
+              <div class="stage-number">3→4</div>
+              <div class="stage-info">
+                <div class="stage-name">ATO Review → Build & Test</div>
+                <div class="stage-meta">Email from AO, verbal approval sometimes</div>
+              </div>
+              <div class="stage-status">
+                <span class="status-badge partial">Unclear</span>
+              </div>
+            </div>
+            <div class="stage-item">
+              <div class="stage-number">4→5</div>
+              <div class="stage-info">
+                <div class="stage-name">Build & Test → Deploy</div>
+                <div class="stage-meta">CI/CD pipeline trigger</div>
+              </div>
+              <div class="stage-status">
+                <span class="status-badge complete">Automated</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Information Systems Used</label>
+          <input type="text" class="form-input" value="Jira, Sharepoint, Email, GitLab, Slack" placeholder="List systems where information lives">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Information Bottlenecks <span class="hint">(Where does info get stuck?)</span></label>
+          <textarea class="form-textarea" placeholder="Describe where information flow breaks down">ATO Review stage: No clear status visibility. Team doesn't know if package is "in review" or "waiting for reviewer." Average 3-5 follow-up emails per package.</textarea>
+        </div>
+      </div>
+      
+      <!-- Pass 3: Metrics -->
+      <div class="form-section" data-section="3">
+        <div class="section-header">
+          <div class="section-icon pass3">📊</div>
+          <div>
+            <div class="section-title">Third Pass: Metric Performance</div>
+            <div class="section-desc">Process Time, Lead Time, and %Complete & Accurate</div>
+          </div>
+        </div>
+        
+        <div class="info-card">
+          <div class="info-card-title">💡 What to capture</div>
+          <div class="info-card-body">
+            <strong>Process Time (PT):</strong> Actual work time when hands are on keyboard<br>
+            <strong>Lead Time (LT):</strong> Total elapsed time including waiting<br>
+            <strong>%C&A:</strong> Percent of work that arrives complete and accurate from upstream
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Stage Metrics</label>
+          <div class="stage-list">
+            <div class="stage-item" style="flex-wrap: wrap;">
+              <div class="stage-number">1</div>
+              <div class="stage-info" style="min-width: 150px;">
+                <div class="stage-name">Requirements Intake</div>
+              </div>
+              <div style="display: flex; gap: 12px; flex: 1; justify-content: flex-end;">
+                <div style="text-align: center;">
+                  <div style="font-size: 10px; color: #888; margin-bottom: 4px;">PT</div>
+                  <input type="text" class="form-input" style="width: 60px; padding: 8px; text-align: center;" value="2d">
+                </div>
+                <div style="text-align: center;">
+                  <div style="font-size: 10px; color: #888; margin-bottom: 4px;">LT</div>
+                  <input type="text" class="form-input" style="width: 60px; padding: 8px; text-align: center;" value="7d">
+                </div>
+                <div style="text-align: center;">
+                  <div style="font-size: 10px; color: #888; margin-bottom: 4px;">%C&A</div>
+                  <input type="text" class="form-input" style="width: 60px; padding: 8px; text-align: center;" value="60%">
+                </div>
+              </div>
+            </div>
+            <div class="stage-item" style="flex-wrap: wrap;">
+              <div class="stage-number">2</div>
+              <div class="stage-info" style="min-width: 150px;">
+                <div class="stage-name">Technical Review</div>
+              </div>
+              <div style="display: flex; gap: 12px; flex: 1; justify-content: flex-end;">
+                <div style="text-align: center;">
+                  <div style="font-size: 10px; color: #888; margin-bottom: 4px;">PT</div>
+                  <input type="text" class="form-input" style="width: 60px; padding: 8px; text-align: center;" value="1d">
+                </div>
+                <div style="text-align: center;">
+                  <div style="font-size: 10px; color: #888; margin-bottom: 4px;">LT</div>
+                  <input type="text" class="form-input" style="width: 60px; padding: 8px; text-align: center;" value="5d">
+                </div>
+                <div style="text-align: center;">
+                  <div style="font-size: 10px; color: #888; margin-bottom: 4px;">%C&A</div>
+                  <input type="text" class="form-input" style="width: 60px; padding: 8px; text-align: center;" value="75%">
+                </div>
+              </div>
+            </div>
+            <div class="stage-item" style="flex-wrap: wrap; border-color: rgba(255,0,0,0.3);">
+              <div class="stage-number" style="background: rgba(255,0,0,0.15); color: #FF0000;">3</div>
+              <div class="stage-info" style="min-width: 150px;">
+                <div class="stage-name">ATO Review <span style="color: #FF0000; font-size: 10px;">BOTTLENECK</span></div>
+              </div>
+              <div style="display: flex; gap: 12px; flex: 1; justify-content: flex-end;">
+                <div style="text-align: center;">
+                  <div style="font-size: 10px; color: #888; margin-bottom: 4px;">PT</div>
+                  <input type="text" class="form-input" style="width: 60px; padding: 8px; text-align: center;" value="3d">
+                </div>
+                <div style="text-align: center;">
+                  <div style="font-size: 10px; color: #888; margin-bottom: 4px;">LT</div>
+                  <input type="text" class="form-input" style="width: 60px; padding: 8px; text-align: center; border-color: #FF0000;" value="45d">
+                </div>
+                <div style="text-align: center;">
+                  <div style="font-size: 10px; color: #888; margin-bottom: 4px;">%C&A</div>
+                  <input type="text" class="form-input" style="width: 60px; padding: 8px; text-align: center;" value="40%">
+                </div>
+              </div>
+            </div>
+            <div class="stage-item" style="flex-wrap: wrap;">
+              <div class="stage-number">4</div>
+              <div class="stage-info" style="min-width: 150px;">
+                <div class="stage-name">Build & Test</div>
+              </div>
+              <div style="display: flex; gap: 12px; flex: 1; justify-content: flex-end;">
+                <div style="text-align: center;">
+                  <div style="font-size: 10px; color: #888; margin-bottom: 4px;">PT</div>
+                  <input type="text" class="form-input" style="width: 60px; padding: 8px; text-align: center;" value="14d">
+                </div>
+                <div style="text-align: center;">
+                  <div style="font-size: 10px; color: #888; margin-bottom: 4px;">LT</div>
+                  <input type="text" class="form-input" style="width: 60px; padding: 8px; text-align: center;" value="21d">
+                </div>
+                <div style="text-align: center;">
+                  <div style="font-size: 10px; color: #888; margin-bottom: 4px;">%C&A</div>
+                  <input type="text" class="form-input" style="width: 60px; padding: 8px; text-align: center;" value="85%">
+                </div>
+              </div>
+            </div>
+            <div class="stage-item" style="flex-wrap: wrap;">
+              <div class="stage-number">5</div>
+              <div class="stage-info" style="min-width: 150px;">
+                <div class="stage-name">Deploy to Prod</div>
+              </div>
+              <div style="display: flex; gap: 12px; flex: 1; justify-content: flex-end;">
+                <div style="text-align: center;">
+                  <div style="font-size: 10px; color: #888; margin-bottom: 4px;">PT</div>
+                  <input type="text" class="form-input" style="width: 60px; padding: 8px; text-align: center;" value="1d">
+                </div>
+                <div style="text-align: center;">
+                  <div style="font-size: 10px; color: #888; margin-bottom: 4px;">LT</div>
+                  <input type="text" class="form-input" style="width: 60px; padding: 8px; text-align: center;" value="20d">
+                </div>
+                <div style="text-align: center;">
+                  <div style="font-size: 10px; color: #888; margin-bottom: 4px;">%C&A</div>
+                  <input type="text" class="form-input" style="width: 60px; padding: 8px; text-align: center;" value="90%">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-row-3">
+          <div class="form-group">
+            <label class="form-label">Total Process Time</label>
+            <input type="text" class="form-input" value="21 days" readonly style="background: #0a0a0a;">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Total Lead Time</label>
+            <input type="text" class="form-input" value="98 days" readonly style="background: #0a0a0a; border-color: rgba(255,0,0,0.3);">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Value-Add Ratio</label>
+            <input type="text" class="form-input" value="21%" readonly style="background: #0a0a0a;">
+          </div>
+        </div>
+      </div>
+      
+      <!-- Navigation -->
+      <div class="nav-buttons">
+        <button class="nav-btn secondary" id="prev-btn" style="display: none;">← Previous Pass</button>
+        <button class="nav-btn primary" id="next-btn">Next Pass →</button>
+      </div>
+    </div>
+    
+    <div class="preview-panel">
+      <div class="preview-title">Claude-Ready Output</div>
+      <div class="preview-content" id="preview">
+<span class="section"># VSM Analysis Request</span>
+
+<span class="comment">## Context</span>
+<span class="key">Customer:</span> <span class="value">309th SWEG</span>
+<span class="key">Value Stream:</span> <span class="value">Software Release Pipeline</span>
+<span class="key">State:</span> <span class="value">Current State</span>
+<span class="key">Captured:</span> <span class="value">2025-12-19</span>
+
+<span class="comment">## Pass 1: Value/Work Flow</span>
+<span class="key">Stages:</span>
+  1. Requirements Intake (PMO → Dev) [VA]
+  2. Technical Review (Dev → Arch Board) [VA]
+  3. ATO Review (Security → AO) [RNVA] ⚠️ BOTTLENECK
+  4. Build & Test (Dev Team) [VA]
+  5. Deploy to Prod (Platform → Prod) [VA]
+
+<span class="key">Wastes Identified:</span>
+  - ⏳ Waiting (ATO stage)
+  - 🔄 Extra Processing (rework cycles)
+
+<span class="comment">## Pass 2: Information Flow</span>
+<span class="key">Trigger:</span> <span class="value">Jira ticket created by PMO</span>
+<span class="key">Systems:</span> <span class="value">Jira, Sharepoint, Email, GitLab, Slack</span>
+
+<span class="key">Flow Analysis:</span>
+  1→2: Manual (email notification)
+  2→3: Manual (Sharepoint drop, no notification)
+  3→4: Unclear (email/verbal mix)
+  4→5: Automated (CI/CD)
+
+<span class="key">Bottleneck:</span> <span class="value">ATO Review - no status visibility, 3-5 follow-up emails per package</span>
+
+<span class="comment">## Pass 3: Metrics</span>
+| Stage | PT | LT | %C&A |
+|-------|----|----|------|
+| Requirements | 2d | 7d | 60% |
+| Tech Review | 1d | 5d | 75% |
+| ATO Review | 3d | 45d | 40% | ← BOTTLENECK
+| Build & Test | 14d | 21d | 85% |
+| Deploy | 1d | 20d | 90% |
+
+<span class="key">Total PT:</span> <span class="value">21 days</span>
+<span class="key">Total LT:</span> <span class="value">98 days</span>
+<span class="key">VA Ratio:</span> <span class="value">21%</span>
+
+<span class="comment">## Analysis Questions for Claude</span>
+1. What patterns do you see in this VSM?
+2. ATO is 46% of total lead time. What interventions would have highest impact?
+3. How does the 40% %C&A at ATO compound downstream waste?
+4. Compare to Rise8 patterns: Is embedded InfoSec a viable intervention?
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Tab switching
+    document.querySelectorAll('.pass-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const pass = tab.dataset.pass;
+        
+        // Update tabs
+        document.querySelectorAll('.pass-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        // Update sections
+        document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+        document.querySelector(`[data-section="${pass}"]`).classList.add('active');
+        
+        // Update progress
+        document.querySelectorAll('.progress-segment').forEach((seg, i) => {
+          seg.classList.remove('complete', 'current');
+          if (i < pass - 1) seg.classList.add('complete');
+          if (i == pass - 1) seg.classList.add('current');
+        });
+        
+        // Update nav buttons
+        document.getElementById('prev-btn').style.display = pass > 1 ? 'block' : 'none';
+        document.getElementById('next-btn').textContent = pass < 3 ? 'Next Pass →' : 'Generate Analysis →';
+      });
+    });
+    
+    // Navigation
+    document.getElementById('next-btn').addEventListener('click', () => {
+      const current = document.querySelector('.pass-tab.active').dataset.pass;
+      if (current < 3) {
+        document.querySelector(`[data-pass="${parseInt(current) + 1}"]`).click();
+      }
+    });
+    
+    document.getElementById('prev-btn').addEventListener('click', () => {
+      const current = document.querySelector('.pass-tab.active').dataset.pass;
+      if (current > 1) {
+        document.querySelector(`[data-pass="${parseInt(current) - 1}"]`).click();
+      }
+    });
+    
+    // Waste tag selection
+    document.querySelectorAll('.waste-tag').forEach(tag => {
+      tag.addEventListener('click', () => {
+        tag.classList.toggle('selected');
+      });
+    });
+    
+    // Classification pill selection
+    document.querySelectorAll('.class-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        document.querySelectorAll('.class-pill').forEach(p => p.classList.remove('selected'));
+        pill.classList.add('selected');
+      });
+    });
+  </script>
+</body>
+</html>

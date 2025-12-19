@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PM OS: Welcome, Rob!</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      background: #131414;
+      font-family: 'DM Sans', sans-serif;
+      color: #F2F2F2;
+    }
+    
+    .header {
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #2B2C2C;
+    }
+    .logo { font-size: 24px; font-weight: 700; }
+    .logo span { color: #FF0000; }
+    
+    .main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 48px 24px;
+    }
+    
+    .hero {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .hero-greeting {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 8px;
+    }
+    .hero-title {
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      line-height: 1.2;
+    }
+    .hero-title span {
+      background: linear-gradient(78deg, #FF0000, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-subtitle {
+      font-size: 16px;
+      color: #CACACA;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    
+    .context-card {
+      background: linear-gradient(135deg, rgba(96, 165, 250, 0.1), rgba(168, 85, 247, 0.05));
+      border: 1px solid rgba(96, 165, 250, 0.2);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 40px;
+    }
+    .context-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .context-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(96, 165, 250, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .context-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .context-body {
+      font-size: 14px;
+      color: #CACACA;
+      line-height: 1.7;
+    }
+    .context-body strong {
+      color: #F2F2F2;
+    }
+    .context-quote {
+      background: rgba(255, 255, 255, 0.05);
+      border-left: 3px solid #60a5fa;
+      padding: 12px 16px;
+      margin: 16px 0;
+      font-style: italic;
+      border-radius: 0 8px 8px 0;
+    }
+    
+    .section-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .coa-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    .coa-card {
+      background: #1a1a1a;
+      border: 1px solid #2B2C2C;
+      border-radius: 16px;
+      padding: 24px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .coa-card:hover {
+      border-color: #FF0000;
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+    .coa-number {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #FF0000;
+      margin-bottom: 8px;
+    }
+    .coa-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .coa-desc {
+      font-size: 13px;
+      color: #888;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+    .coa-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .coa-time {
+      font-size: 11px;
+      color: #666;
+    }
+    .coa-action {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      color: #FF0000;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .problem-solution {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+    .ps-card {
+      background: #1a1a1a;
+      border: 1px solid #2B2C2C;
+      border-radius: 16px;
+      padding: 24px;
+    }
+    .ps-card.problem { border-color: rgba(255, 0, 0, 0.3); }
+    .ps-card.solution { border-color: rgba(34, 197, 94, 0.3); }
+    .ps-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .ps-icon { font-size: 24px; }
+    .ps-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .ps-title.problem { color: #FF0000; }
+    .ps-title.solution { color: #22c55e; }
+    .ps-list { list-style: none; }
+    .ps-list li {
+      font-size: 13px;
+      color: #CACACA;
+      padding: 8px 0;
+      border-bottom: 1px solid #2B2C2C;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .ps-list li:last-child { border-bottom: none; }
+    .ps-list li::before { content: "→"; color: #666; }
+    
+    .craft-section {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.08), rgba(96, 165, 250, 0.05));
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 40px;
+    }
+    .craft-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .craft-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #a855f7, #60a5fa);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+    .craft-header-text h2 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .craft-header-text p {
+      font-size: 13px;
+      color: #888;
+    }
+    .craft-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .craft-card {
+      background: #1a1a1a;
+      border: 1px solid #2B2C2C;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .craft-card:hover {
+      border-color: #a855f7;
+      transform: translateY(-2px);
+    }
+    .craft-stat {
+      font-size: 28px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #a855f7, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
+    }
+    .craft-label {
+      font-size: 11px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .craft-artifacts {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .artifact-item {
+      background: #131414;
+      border: 1px solid #2B2C2C;
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.2s;
+    }
+    .artifact-item:hover { border-color: #444; }
+    .artifact-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .artifact-icon.research { background: rgba(34, 197, 94, 0.15); }
+    .artifact-icon.framework { background: rgba(96, 165, 250, 0.15); }
+    .artifact-icon.roadmap { background: rgba(234, 179, 8, 0.15); }
+    .artifact-icon.hypothesis { background: rgba(168, 85, 247, 0.15); }
+    .artifact-text { flex: 1; }
+    .artifact-title {
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+    .artifact-desc {
+      font-size: 11px;
+      color: #888;
+    }
+    
+    .vsm-connection {
+      background: #1a1a1a;
+      border: 1px solid #2B2C2C;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 40px;
+    }
+    .vsm-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .vsm-badge {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 4px;
+      background: rgba(255, 0, 0, 0.15);
+      color: #FF0000;
+      text-transform: uppercase;
+    }
+    .vsm-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .vsm-body {
+      font-size: 14px;
+      color: #CACACA;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    .vsm-metric {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      background: #131414;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .vsm-metric-item { text-align: center; }
+    .vsm-metric-value {
+      font-size: 32px;
+      font-weight: 700;
+    }
+    .vsm-metric-value.current { color: #FF0000; }
+    .vsm-metric-value.target { color: #22c55e; }
+    .vsm-metric-label {
+      font-size: 11px;
+      color: #888;
+    }
+    .vsm-metric-arrow {
+      font-size: 24px;
+      color: #444;
+    }
+    
+    /* Competency Section */
+    .competency-section {
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(96, 165, 250, 0.05));
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 40px;
+    }
+    .competency-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .competency-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #22c55e, #60a5fa);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+    .competency-header-text h2 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .competency-header-text p {
+      font-size: 13px;
+      color: #888;
+    }
+    
+    .level-progression {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .level-card {
+      flex: 1;
+      background: #1a1a1a;
+      border: 1px solid #2B2C2C;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .level-card.current {
+      border-color: rgba(234, 179, 8, 0.5);
+      background: rgba(234, 179, 8, 0.05);
+    }
+    .level-card.target {
+      border-color: rgba(34, 197, 94, 0.5);
+      background: rgba(34, 197, 94, 0.05);
+    }
+    .level-badge {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      display: inline-block;
+      margin-bottom: 12px;
+    }
+    .level-badge.current {
+      background: rgba(234, 179, 8, 0.15);
+      color: #eab308;
+    }
+    .level-badge.target {
+      background: rgba(34, 197, 94, 0.15);
+      color: #22c55e;
+    }
+    .level-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .level-theme {
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 12px;
+    }
+    .level-examples {
+      font-size: 12px;
+      color: #CACACA;
+      line-height: 1.5;
+    }
+    .level-examples strong {
+      color: #F2F2F2;
+    }
+    
+    .competency-table {
+      background: #131414;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .competency-row {
+      display: grid;
+      grid-template-columns: 140px 1fr 1fr;
+      border-bottom: 1px solid #2B2C2C;
+    }
+    .competency-row:last-child {
+      border-bottom: none;
+    }
+    .competency-row.header {
+      background: #1a1a1a;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #888;
+    }
+    .competency-cell {
+      padding: 12px 16px;
+      font-size: 12px;
+      border-right: 1px solid #2B2C2C;
+    }
+    .competency-cell:last-child {
+      border-right: none;
+    }
+    .competency-cell.area {
+      font-weight: 500;
+      color: #F2F2F2;
+    }
+    .competency-cell.l6 {
+      color: #eab308;
+    }
+    .competency-cell.l7 {
+      color: #22c55e;
+    }
+    
+    .footer-cta {
+      text-align: center;
+      padding: 32px;
+      background: linear-gradient(135deg, rgba(255, 0, 0, 0.08), rgba(128, 0, 49, 0.05));
+      border: 1px solid rgba(255, 0, 0, 0.2);
+      border-radius: 16px;
+    }
+    .footer-cta-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .footer-cta-desc {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 20px;
+    }
+    .footer-cta-btn {
+      display: inline-block;
+      padding: 14px 32px;
+      background: linear-gradient(78deg, #800031, #FF0000);
+      border-radius: 10px;
+      color: white;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .footer-cta-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(255, 0, 0, 0.3);
+    }
+    
+    .from-michael {
+      margin-top: 48px;
+      padding-top: 32px;
+      border-top: 1px solid #2B2C2C;
+      text-align: center;
+    }
+    .from-michael-label {
+      font-size: 11px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    .from-michael-name {
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .from-michael-role {
+      font-size: 12px;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="logo">PM <span>/</span> OS</div>
+  </header>
+
+  <main class="main">
+    <div class="hero">
+      <div class="hero-greeting">Hey Rob! 👋🏾</div>
+      <h1 class="hero-title">
+        What if your VSM data could <span>talk to Claude</span>?
+      </h1>
+      <p class="hero-subtitle">
+        You mentioned experimenting with getting FigJam VSM data into Claude. PM OS is the structured layer that makes that possible. I built these prototypes based on your PM Practice Office Hours session.
+      </p>
+    </div>
+
+    <div class="context-card">
+      <div class="context-header">
+        <div class="context-icon">🎤</div>
+        <div class="context-title">What I Heard You Say (Dec 18 Office Hours)</div>
+      </div>
+      <div class="context-body">
+        <div class="context-quote">
+          "Especially if you're starting to think about how you're going to maybe take this stuff out of FigJam and maybe into like Claude. I'm still playing with that, trying to figure out how organizing or more organization or less organization of the data is going to help Claude."
+        </div>
+        <p>
+          <strong>The problem:</strong> FigJam is great for facilitation, but the data is trapped. Copy/paste loses structure. Screenshots lose queryability. There's no good path from visual workshop to AI analysis.
+        </p>
+        <p style="margin-top: 12px;">
+          <strong>The opportunity:</strong> PM OS becomes the structured middle layer. Run your workshop in FigJam. Enter key data into PM OS. Now it's queryable, trackable over time, and Claude-ready.
+        </p>
+      </div>
+    </div>
+
+    <div class="vsm-connection">
+      <div class="vsm-header">
+        <span class="vsm-badge">Rise8 Mission</span>
+        <div class="vsm-title">VSM Compression: The Business Case</div>
+      </div>
+      <div class="vsm-body">
+        PM OS directly supports Rise8's strategic goal: compress the value stream from engagement start to outcomes in prod. Every day saved on PM friction is a day recovered for delivery. This translates to competitive customer rates and market advantage.
+      </div>
+      <div class="vsm-metric">
+        <div class="vsm-metric-item">
+          <div class="vsm-metric-value current">180d</div>
+          <div class="vsm-metric-label">Current State</div>
+        </div>
+        <div class="vsm-metric-arrow">→</div>
+        <div class="vsm-metric-item">
+          <div class="vsm-metric-value target">90d</div>
+          <div class="vsm-metric-label">Target State</div>
+        </div>
+        <div style="flex: 1; text-align: right;">
+          <div style="font-size: 12px; color: #888;">AI-enabled delivery acceleration</div>
+          <div style="font-size: 11px; color: #666; margin-top: 4px;">50% reduction in time to outcomes in prod</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="problem-solution">
+      <div class="ps-card problem">
+        <div class="ps-header">
+          <span class="ps-icon">😤</span>
+          <span class="ps-title problem">Current Pain</span>
+        </div>
+        <ul class="ps-list">
+          <li>VSM data trapped in FigJam after workshops</li>
+          <li>Manual copy/paste loses structure</li>
+          <li>Screenshots lose queryability</li>
+          <li>No way to track VSM changes over time</li>
+          <li>Can't see patterns across engagements</li>
+          <li>Transformation Action Plan is static</li>
+        </ul>
+      </div>
+      <div class="ps-card solution">
+        <div class="ps-header">
+          <span class="ps-icon">✨</span>
+          <span class="ps-title solution">PM OS Solution</span>
+        </div>
+        <ul class="ps-list">
+          <li>Quick entry form (~3 min per stage)</li>
+          <li>Structured schema preserves relationships</li>
+          <li>Auto-formatted for Claude analysis</li>
+          <li>Living VSM with 4D time progression</li>
+          <li>Cross-VSM patterns surface automatically</li>
+          <li>Action Plan becomes live Kanban board</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section-title">🎯 Explore PM OS: 4 Courses of Action</div>
+    <div class="coa-grid">
+      <a href="PM_OS_Rob_VSM_Entry.html" class="coa-card">
+        <div class="coa-number">COA 1</div>
+        <div class="coa-title">Enter VSM Data (Quick Entry)</div>
+        <div class="coa-desc">
+          See how easy it is to enter stage data with minimal friction. Pre-filled with 309th SWEG example. Watch the Claude-ready output generate in real time.
+        </div>
+        <div class="coa-meta">
+          <span class="coa-time">⏱️ ~2 min to explore</span>
+          <span class="coa-action">Try It →</span>
+        </div>
+      </a>
+      
+      <a href="PM_OS_Rob_ActionPlan.html" class="coa-card">
+        <div class="coa-number">COA 2</div>
+        <div class="coa-title">Track Transformation Actions</div>
+        <div class="coa-desc">
+          Your charter's Transformation Action Plan as a live Kanban board. Just Do Its, Spikes, and Initiatives with owners, progress, and VSM impact.
+        </div>
+        <div class="coa-meta">
+          <span class="coa-time">⏱️ ~2 min to explore</span>
+          <span class="coa-action">Try It →</span>
+        </div>
+      </a>
+      
+      <a href="PM_OS_Rob_LivingVSM.html" class="coa-card">
+        <div class="coa-number">COA 3</div>
+        <div class="coa-title">View the Living VSM</div>
+        <div class="coa-desc">
+          VSM that evolves over time. Drag the timeline slider to see progression from baseline to target. Bottlenecks highlighted. Wastes visualized.
+        </div>
+        <div class="coa-meta">
+          <span class="coa-time">⏱️ ~2 min to explore</span>
+          <span class="coa-action">Try It →</span>
+        </div>
+      </a>
+      
+      <a href="PM_OS_Rob_Insights.html" class="coa-card">
+        <div class="coa-number">COA 4</div>
+        <div class="coa-title">See Cross-VSM Patterns</div>
+        <div class="coa-desc">
+          Patterns that emerge across all Rise8 engagements. ATO bottleneck appears in 9 of 12 VSMs. Waiting waste in 100%. Insights that scale to Playbooks.
+        </div>
+        <div class="coa-meta">
+          <span class="coa-time">⏱️ ~2 min to explore</span>
+          <span class="coa-action">Try It →</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- PM Craft Section -->
+    <div class="craft-section">
+      <div class="craft-header">
+        <div class="craft-icon">🔬</div>
+        <div class="craft-header-text">
+          <h2>How I Built This: Data-Informed PM Craft</h2>
+          <p>PM OS isn't assumptions. It's rooted in research data from the AI Adoption initiative.</p>
+        </div>
+      </div>
+      
+      <div class="craft-grid">
+        <div class="craft-card">
+          <div class="craft-stat">11</div>
+          <div class="craft-label">Interviews Conducted</div>
+        </div>
+        <div class="craft-card">
+          <div class="craft-stat">64%</div>
+          <div class="craft-label">Champion Conversion</div>
+        </div>
+        <div class="craft-card">
+          <div class="craft-stat">5</div>
+          <div class="craft-label">Friction Types Identified</div>
+        </div>
+      </div>
+      
+      <div class="craft-artifacts">
+        <div class="artifact-item">
+          <div class="artifact-icon research">📊</div>
+          <div class="artifact-text">
+            <div class="artifact-title">Research Analysis</div>
+            <div class="artifact-desc">11 interviews synthesized into actionable insights</div>
+          </div>
+        </div>
+        <div class="artifact-item">
+          <div class="artifact-icon framework">🧮</div>
+          <div class="artifact-text">
+            <div class="artifact-title">Frictionless Framework</div>
+            <div class="artifact-desc">Value Equation: Is effort worth the output?</div>
+          </div>
+        </div>
+        <div class="artifact-item">
+          <div class="artifact-icon hypothesis">🧪</div>
+          <div class="artifact-text">
+            <div class="artifact-title">Hypotheses with INVEST</div>
+            <div class="artifact-desc">10 testable assumptions with validation criteria</div>
+          </div>
+        </div>
+        <div class="artifact-item">
+          <div class="artifact-icon roadmap">🗺️</div>
+          <div class="artifact-text">
+            <div class="artifact-title">Outcome-Oriented Roadmap</div>
+            <div class="artifact-desc">Aligned to Rise8 Delivery Playbook patterns</div>
+          </div>
+        </div>
+      </div>
+      
+      <div style="margin-top: 20px; padding: 16px; background: #131414; border-radius: 10px;">
+        <div style="font-size: 13px; color: #CACACA; line-height: 1.6;">
+          <strong style="color: #a855f7;">The Frictionless Insight:</strong> Traditional adoption thinking focuses on changing people through training and mandates. Frictionless thinking focuses on changing the system by reducing setup time, improving output quality, and clarifying workflows. This reframe came directly from interview data showing 9 of 11 Risers cited friction-based barriers, not capacity constraints.
+        </div>
+      </div>
+    </div>
+
+    <!-- Competency Section -->
+    <div class="competency-section">
+      <div class="competency-header">
+        <div class="competency-icon">📈</div>
+        <div class="competency-header-text">
+          <h2>PM OS as Competency Development</h2>
+          <p>This work demonstrates Level 6 competencies while building toward Level 7.</p>
+        </div>
+      </div>
+      
+      <div class="level-progression">
+        <div class="level-card current">
+          <span class="level-badge current">Level 6 (Current Target)</span>
+          <div class="level-title">Advocating Practices</div>
+          <div class="level-theme">Scope: Other teams, departments, organizations</div>
+          <div class="level-examples">
+            <strong>Evidence in PM OS:</strong> Handling ambiguity → outcomes, enabling other PMs, pattern documentation, cross-team collaboration with you
+          </div>
+        </div>
+        <div class="level-card target">
+          <span class="level-badge target">Level 7 (Building Toward)</span>
+          <div class="level-title">Generating Impact Through Others</div>
+          <div class="level-theme">Scope: Portfolio, organization-wide</div>
+          <div class="level-examples">
+            <strong>Evidence in PM OS:</strong> Cross-VSM patterns → Playbooks, coaching framework, scalable metrics architecture, inspiring action at scale
+          </div>
+        </div>
+      </div>
+      
+      <div class="competency-table">
+        <div class="competency-row header">
+          <div class="competency-cell">Competency Area</div>
+          <div class="competency-cell">Level 6 Expression</div>
+          <div class="competency-cell">Level 7 Expression</div>
+        </div>
+        <div class="competency-row">
+          <div class="competency-cell area">Data & Insights</div>
+          <div class="competency-cell l6">Leads appropriate research; Defines pivot/persevere criteria</div>
+          <div class="competency-cell l7">Establishes metric frameworks for portfolio; Coaches teams on data fluency</div>
+        </div>
+        <div class="competency-row">
+          <div class="competency-cell area">PM Leadership</div>
+          <div class="competency-cell l6">Models practices for others; Sequences goals for complicated missions</div>
+          <div class="competency-cell l7">Inspires action that adjusts practices; Delivers results for cross-functional challenges</div>
+        </div>
+        <div class="competency-row">
+          <div class="competency-cell area">Consultancy</div>
+          <div class="competency-cell l6">Identifies cross-team collaboration; Translates complex → simple narratives</div>
+          <div class="competency-cell l7">Advises on complex challenges proactively; Coaches on consulting standards</div>
+        </div>
+        <div class="competency-row">
+          <div class="competency-cell area">Outcomes & Impact</div>
+          <div class="competency-cell l6">Breaks large bets into experiments; Solves complex problems</div>
+          <div class="competency-cell l7">Aligns outcome opportunities across teams; Manages constraints at scale</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-cta">
+      <div class="footer-cta-title">Want to Pair on This?</div>
+      <div class="footer-cta-desc">
+        I'd love to collaborate on the AI integration piece. You have the VSM expertise. I've been experimenting with Claude for PM work. Together we could build something useful for all of Rise8.
+      </div>
+      <a href="https://calendar.app.google/iyMwZeRoqJcmR2fNA" class="footer-cta-btn" target="_blank">Schedule 30 Min Pairing →</a>
+    </div>
+
+    <div class="from-michael">
+      <div class="from-michael-label">Built for you by</div>
+      <div class="from-michael-name">Michael Estoy</div>
+      <div class="from-michael-role">Product Manager, AI Adoption Initiative</div>
+    </div>
+  </main>
+</body>
+</html>

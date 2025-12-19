@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PM OS: Living VSM</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      background: #131414;
+      font-family: 'DM Sans', sans-serif;
+      color: #F2F2F2;
+    }
+    
+    .header {
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #2B2C2C;
+    }
+    .logo { font-size: 20px; font-weight: 700; }
+    .logo span { color: #FF0000; }
+    
+    .nav-tabs {
+      display: flex;
+      gap: 4px;
+      background: #1a1a1a;
+      padding: 4px;
+      border-radius: 8px;
+    }
+    .nav-tab {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #888;
+    }
+    .nav-tab:hover { color: #F2F2F2; }
+    .nav-tab.active {
+      background: #2B2C2C;
+      color: #F2F2F2;
+    }
+    
+    .main {
+      padding: 32px 24px;
+    }
+    
+    /* Time Controls */
+    .time-controls {
+      background: #1a1a1a;
+      border: 1px solid #2B2C2C;
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .time-label {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #888;
+    }
+    .time-slider-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .time-slider {
+      width: 100%;
+      height: 8px;
+      background: #2B2C2C;
+      border-radius: 4px;
+      appearance: none;
+      cursor: pointer;
+    }
+    .time-slider::-webkit-slider-thumb {
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(78deg, #800031, #FF0000);
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(255, 0, 0, 0.4);
+    }
+    .time-markers {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #666;
+    }
+    .time-marker.active {
+      color: #FF0000;
+      font-weight: 600;
+    }
+    .play-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(78deg, #800031, #FF0000);
+      border: none;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Summary Cards */
+    .summary-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .summary-card {
+      background: #1a1a1a;
+      border: 1px solid #2B2C2C;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .summary-label {
+      font-size: 11px;
+      color: #888;
+      margin-bottom: 8px;
+    }
+    .summary-value {
+      font-size: 32px;
+      font-weight: 700;
+    }
+    .summary-change {
+      font-size: 12px;
+      margin-top: 4px;
+    }
+    .summary-change.positive { color: #22c55e; }
+    .summary-change.negative { color: #FF0000; }
+    
+    /* VSM Visualization */
+    .vsm-container {
+      background: #1a1a1a;
+      border: 1px solid #2B2C2C;
+      border-radius: 16px;
+      padding: 32px;
+      overflow-x: auto;
+    }
+    .vsm-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .vsm-badge {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 4px;
+      background: rgba(96, 165, 250, 0.15);
+      color: #60a5fa;
+    }
+    
+    .vsm-flow {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      min-width: 1100px;
+    }
+    
+    /* Stage Block */
+    .stage-block {
+      flex: 1;
+      min-width: 180px;
+      position: relative;
+    }
+    .stage-box {
+      background: #131414;
+      border: 2px solid #2B2C2C;
+      border-radius: 12px;
+      padding: 16px;
+      position: relative;
+      transition: all 0.3s;
+    }
+    .stage-box.bottleneck {
+      border-color: #FF0000;
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.15);
+    }
+    .stage-box.improved {
+      border-color: #22c55e;
+    }
+    .stage-box.optimized {
+      border-color: #60a5fa;
+    }
+    
+    .stage-status {
+      position: absolute;
+      top: -10px;
+      right: 12px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 9px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .status-bottleneck {
+      background: rgba(255, 0, 0, 0.15);
+      color: #FF0000;
+    }
+    .status-improved {
+      background: rgba(34, 197, 94, 0.15);
+      color: #22c55e;
+    }
+    .status-optimized {
+      background: rgba(96, 165, 250, 0.15);
+      color: #60a5fa;
+    }
+    
+    .stage-header {
+      margin-bottom: 12px;
+    }
+    .stage-dept {
+      font-size: 10px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .stage-name {
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    
+    .stage-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .metric {
+      background: #1a1a1a;
+      border-radius: 6px;
+      padding: 8px;
+      text-align: center;
+    }
+    .metric-value {
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .metric-label {
+      font-size: 9px;
+      color: #888;
+    }
+    .metric-change {
+      font-size: 9px;
+      margin-top: 2px;
+    }
+    .metric-change.positive { color: #22c55e; }
+    
+    .stage-wastes {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+    .waste-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      background: rgba(234, 179, 8, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      cursor: help;
+    }
+    
+    .people-count {
+      position: absolute;
+      top: -12px;
+      left: 12px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #60a5fa;
+      color: #131414;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Arrow */
+    .stage-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      color: #333;
+      font-size: 20px;
+      margin-top: 50px;
+    }
+    
+    /* Lead Time Bar */
+    .lead-time-bar {
+      height: 8px;
+      background: #2B2C2C;
+      border-radius: 4px;
+      margin-top: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .lead-time-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s;
+    }
+    .lead-time-fill.bottleneck { background: #FF0000; }
+    .lead-time-fill.improved { background: #22c55e; }
+    .lead-time-fill.optimized { background: #60a5fa; }
+    
+    .lead-time-label {
+      font-size: 10px;
+      color: #888;
+      margin-top: 8px;
+      text-align: center;
+    }
+    
+    /* COA Section */
+    .coa-section {
+      background: linear-gradient(135deg, rgba(255, 0, 0, 0.05), rgba(128, 0, 49, 0.05));
+      border: 1px solid rgba(255, 0, 0, 0.2);
+      border-radius: 16px;
+      padding: 24px;
+      margin-top: 32px;
+    }
+    .coa-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .coa-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(78deg, #800031, #FF0000);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .coa-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .coa-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .coa-card {
+      background: #1a1a1a;
+      border: 1px solid #2B2C2C;
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .coa-card:hover {
+      border-color: #FF0000;
+      transform: translateY(-2px);
+    }
+    .coa-card-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .coa-card-desc {
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+    .coa-card-action {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      color: #FF0000;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    /* Legend */
+    .legend {
+      display: flex;
+      gap: 24px;
+      margin-top: 24px;
+      justify-content: center;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: #888;
+    }
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+    }
+    .legend-dot.bottleneck { background: #FF0000; }
+    .legend-dot.improved { background: #22c55e; }
+    .legend-dot.optimized { background: #60a5fa; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="logo">PM <span>/</span> OS</div>
+    <nav class="nav-tabs">
+      <div class="nav-tab">VSM Entry</div>
+      <div class="nav-tab">Action Plan</div>
+      <div class="nav-tab active">Living VSM</div>
+      <div class="nav-tab">Insights</div>
+    </nav>
+  </header>
+
+  <main class="main">
+    <!-- Time Controls -->
+    <div class="time-controls">
+      <div class="time-label">Timeline</div>
+      <button class="play-btn">▶</button>
+      <div class="time-slider-container">
+        <input type="range" class="time-slider" min="0" max="3" value="2" />
+        <div class="time-markers">
+          <span>Oct 2025 (Baseline)</span>
+          <span>Nov 2025</span>
+          <span class="active">Dec 2025 (Current)</span>
+          <span>Q1 2026 (Target)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-row">
+      <div class="summary-card">
+        <div class="summary-label">Total Lead Time</div>
+        <div class="summary-value">98d</div>
+        <div class="summary-change positive">↓ 47 days from baseline</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Process Time</div>
+        <div class="summary-value">12d</div>
+        <div class="summary-change positive">↓ 3 days from baseline</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Value-Add Ratio</div>
+        <div class="summary-value">50%</div>
+        <div class="summary-change positive">↑ 17% from baseline</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Active Wastes</div>
+        <div class="summary-value">4</div>
+        <div class="summary-change positive">↓ 3 eliminated</div>
+      </div>
+    </div>
+
+    <!-- VSM Visualization -->
+    <div class="vsm-container">
+      <div class="vsm-title">
+        309th SWEG Value Stream
+        <span class="vsm-badge">December 2025</span>
+      </div>
+      
+      <div class="vsm-flow">
+        <!-- Stage 1 -->
+        <div class="stage-block">
+          <div class="stage-box improved">
+            <div class="people-count">2</div>
+            <span class="stage-status status-improved">Improved</span>
+            <div class="stage-header">
+              <div class="stage-dept">Program Office</div>
+              <div class="stage-name">Requirements Intake</div>
+            </div>
+            <div class="stage-metrics">
+              <div class="metric">
+                <div class="metric-value">2d</div>
+                <div class="metric-label">Process</div>
+              </div>
+              <div class="metric">
+                <div class="metric-value">7d</div>
+                <div class="metric-label">Lead</div>
+                <div class="metric-change positive">was 21d</div>
+              </div>
+            </div>
+            <div class="stage-wastes">
+              <div class="waste-icon" title="Waiting">⏳</div>
+            </div>
+          </div>
+          <div class="lead-time-bar">
+            <div class="lead-time-fill improved" style="width: 15%;"></div>
+          </div>
+          <div class="lead-time-label">7 days (was 21)</div>
+        </div>
+
+        <div class="stage-arrow">→</div>
+
+        <!-- Stage 2 -->
+        <div class="stage-block">
+          <div class="stage-box optimized">
+            <div class="people-count">4</div>
+            <span class="stage-status status-optimized">Optimized</span>
+            <div class="stage-header">
+              <div class="stage-dept">Engineering</div>
+              <div class="stage-name">Technical Review</div>
+            </div>
+            <div class="stage-metrics">
+              <div class="metric">
+                <div class="metric-value">1d</div>
+                <div class="metric-label">Process</div>
+              </div>
+              <div class="metric">
+                <div class="metric-value">5d</div>
+                <div class="metric-label">Lead</div>
+                <div class="metric-change positive">was 14d</div>
+              </div>
+            </div>
+            <div class="stage-wastes">
+              <!-- No active wastes -->
+            </div>
+          </div>
+          <div class="lead-time-bar">
+            <div class="lead-time-fill optimized" style="width: 10%;"></div>
+          </div>
+          <div class="lead-time-label">5 days (was 14)</div>
+        </div>
+
+        <div class="stage-arrow">→</div>
+
+        <!-- Stage 3 -->
+        <div class="stage-block">
+          <div class="stage-box bottleneck">
+            <div class="people-count">3</div>
+            <span class="stage-status status-bottleneck">Bottleneck</span>
+            <div class="stage-header">
+              <div class="stage-dept">Security</div>
+              <div class="stage-name">ATO Review</div>
+            </div>
+            <div class="stage-metrics">
+              <div class="metric">
+                <div class="metric-value">5d</div>
+                <div class="metric-label">Process</div>
+              </div>
+              <div class="metric">
+                <div class="metric-value">45d</div>
+                <div class="metric-label">Lead</div>
+              </div>
+            </div>
+            <div class="stage-wastes">
+              <div class="waste-icon" title="Waiting">⏳</div>
+              <div class="waste-icon" title="Extra Processing">⚙️</div>
+              <div class="waste-icon" title="Inventory">📚</div>
+            </div>
+          </div>
+          <div class="lead-time-bar">
+            <div class="lead-time-fill bottleneck" style="width: 95%;"></div>
+          </div>
+          <div class="lead-time-label">45 days (bottleneck)</div>
+        </div>
+
+        <div class="stage-arrow">→</div>
+
+        <!-- Stage 4 -->
+        <div class="stage-block">
+          <div class="stage-box improved">
+            <div class="people-count">6</div>
+            <span class="stage-status status-improved">Improved</span>
+            <div class="stage-header">
+              <div class="stage-dept">Development</div>
+              <div class="stage-name">Build & Test</div>
+            </div>
+            <div class="stage-metrics">
+              <div class="metric">
+                <div class="metric-value">3d</div>
+                <div class="metric-label">Process</div>
+              </div>
+              <div class="metric">
+                <div class="metric-value">21d</div>
+                <div class="metric-label">Lead</div>
+                <div class="metric-change positive">was 35d</div>
+              </div>
+            </div>
+            <div class="stage-wastes">
+              <div class="waste-icon" title="Waiting">⏳</div>
+            </div>
+          </div>
+          <div class="lead-time-bar">
+            <div class="lead-time-fill improved" style="width: 45%;"></div>
+          </div>
+          <div class="lead-time-label">21 days (was 35)</div>
+        </div>
+
+        <div class="stage-arrow">→</div>
+
+        <!-- Stage 5 -->
+        <div class="stage-block">
+          <div class="stage-box optimized">
+            <div class="people-count">2</div>
+            <span class="stage-status status-optimized">Optimized</span>
+            <div class="stage-header">
+              <div class="stage-dept">Operations</div>
+              <div class="stage-name">Deploy to Prod</div>
+            </div>
+            <div class="stage-metrics">
+              <div class="metric">
+                <div class="metric-value">1d</div>
+                <div class="metric-label">Process</div>
+              </div>
+              <div class="metric">
+                <div class="metric-value">20d</div>
+                <div class="metric-label">Lead</div>
+                <div class="metric-change positive">was 30d</div>
+              </div>
+            </div>
+            <div class="stage-wastes">
+              <!-- No active wastes -->
+            </div>
+          </div>
+          <div class="lead-time-bar">
+            <div class="lead-time-fill optimized" style="width: 43%;"></div>
+          </div>
+          <div class="lead-time-label">20 days (was 30)</div>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-dot bottleneck"></div>
+          Bottleneck (focus here)
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot improved"></div>
+          Improved (keep going)
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot optimized"></div>
+          Optimized (maintain)
+        </div>
+      </div>
+    </div>
+
+    <!-- COA Section -->
+    <div class="coa-section">
+      <div class="coa-header">
+        <div class="coa-icon">🎯</div>
+        <div>
+          <div class="coa-title">Courses of Action: Living VSM</div>
+        </div>
+      </div>
+      
+      <div class="coa-grid">
+        <div class="coa-card">
+          <div class="coa-card-title">COA 1: Focus on the ATO Bottleneck</div>
+          <div class="coa-card-desc">
+            ATO Review accounts for 46% of total lead time (45 of 98 days). Every day saved here has the highest impact on total cycle time.
+          </div>
+          <div class="coa-card-action">View ATO Actions →</div>
+        </div>
+        
+        <div class="coa-card">
+          <div class="coa-card-title">COA 2: Play the Timeline</div>
+          <div class="coa-card-desc">
+            Use the timeline slider to see how the VSM evolved from baseline. Share the animation with stakeholders to demonstrate progress.
+          </div>
+          <div class="coa-card-action">Export Animation →</div>
+        </div>
+        
+        <div class="coa-card">
+          <div class="coa-card-title">COA 3: Compare to Target</div>
+          <div class="coa-card-desc">
+            Slide to Q1 2026 to see the target state. Gap analysis shows ATO must drop from 45 to 20 days to hit the goal.
+          </div>
+          <div class="coa-card-action">View Gap Analysis →</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

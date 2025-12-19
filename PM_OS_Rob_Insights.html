@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PM OS: Cross-VSM Insights</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      background: #131414;
+      font-family: 'DM Sans', sans-serif;
+      color: #F2F2F2;
+    }
+    
+    .header {
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #2B2C2C;
+    }
+    .logo { font-size: 20px; font-weight: 700; }
+    .logo span { color: #FF0000; }
+    
+    .nav-tabs {
+      display: flex;
+      gap: 4px;
+      background: #1a1a1a;
+      padding: 4px;
+      border-radius: 8px;
+    }
+    .nav-tab {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #888;
+    }
+    .nav-tab:hover { color: #F2F2F2; }
+    .nav-tab.active {
+      background: #2B2C2C;
+      color: #F2F2F2;
+    }
+    
+    .main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+    
+    /* Page Header */
+    .page-header {
+      margin-bottom: 32px;
+    }
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .page-subtitle {
+      color: #888;
+      font-size: 14px;
+    }
+    
+    /* Stats Row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .stat-card {
+      background: #1a1a1a;
+      border: 1px solid #2B2C2C;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-size: 11px;
+      color: #888;
+    }
+    
+    /* Insight Card */
+    .insights-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+    .insight-card {
+      background: #1a1a1a;
+      border: 1px solid #2B2C2C;
+      border-radius: 16px;
+      padding: 24px;
+      transition: all 0.2s;
+    }
+    .insight-card:hover {
+      border-color: #444;
+    }
+    .insight-card.featured {
+      grid-column: span 2;
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.08), rgba(96, 165, 250, 0.05));
+      border-color: rgba(168, 85, 247, 0.3);
+    }
+    
+    .insight-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+    .insight-badges {
+      display: flex;
+      gap: 6px;
+    }
+    .insight-badge {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 4px;
+    }
+    .badge-pattern {
+      background: rgba(168, 85, 247, 0.15);
+      color: #a855f7;
+    }
+    .badge-validated {
+      background: rgba(34, 197, 94, 0.15);
+      color: #22c55e;
+    }
+    .badge-new {
+      background: rgba(96, 165, 250, 0.15);
+      color: #60a5fa;
+    }
+    .badge-playbook {
+      background: rgba(234, 179, 8, 0.15);
+      color: #eab308;
+    }
+    
+    .insight-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+    .insight-desc {
+      font-size: 14px;
+      color: #CACACA;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    
+    .insight-evidence {
+      background: #131414;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .evidence-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #888;
+      margin-bottom: 12px;
+    }
+    .evidence-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .evidence-item {
+      text-align: center;
+    }
+    .evidence-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #60a5fa;
+    }
+    .evidence-label {
+      font-size: 10px;
+      color: #888;
+    }
+    
+    .insight-quote {
+      background: rgba(34, 197, 94, 0.05);
+      border-left: 3px solid #22c55e;
+      padding: 12px 16px;
+      font-style: italic;
+      font-size: 13px;
+      color: #CACACA;
+      margin-bottom: 16px;
+      border-radius: 0 8px 8px 0;
+    }
+    .quote-source {
+      font-style: normal;
+      font-size: 11px;
+      color: #888;
+      margin-top: 8px;
+    }
+    
+    .insight-actions {
+      display: flex;
+      gap: 12px;
+    }
+    .insight-btn {
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+    .insight-btn-primary {
+      background: linear-gradient(78deg, #800031, #FF0000);
+      color: white;
+    }
+    .insight-btn-secondary {
+      background: #2B2C2C;
+      color: #F2F2F2;
+    }
+    
+    /* Waste Chart */
+    .waste-section {
+      background: #1a1a1a;
+      border: 1px solid #2B2C2C;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+    .waste-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    .waste-chart {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .waste-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .waste-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(234, 179, 8, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+    .waste-name {
+      width: 140px;
+      font-size: 13px;
+    }
+    .waste-bar-container {
+      flex: 1;
+      height: 24px;
+      background: #131414;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .waste-bar {
+      height: 100%;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      padding-left: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .waste-bar.high { background: linear-gradient(90deg, #FF0000, #800031); }
+    .waste-bar.medium { background: linear-gradient(90deg, #eab308, #ca8a04); color: #131414; }
+    .waste-bar.low { background: linear-gradient(90deg, #22c55e, #16a34a); }
+    
+    /* COA Section */
+    .coa-section {
+      background: linear-gradient(135deg, rgba(255, 0, 0, 0.05), rgba(128, 0, 49, 0.05));
+      border: 1px solid rgba(255, 0, 0, 0.2);
+      border-radius: 16px;
+      padding: 24px;
+    }
+    .coa-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .coa-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(78deg, #800031, #FF0000);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .coa-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .coa-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .coa-card {
+      background: #1a1a1a;
+      border: 1px solid #2B2C2C;
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .coa-card:hover {
+      border-color: #FF0000;
+      transform: translateY(-2px);
+    }
+    .coa-card-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .coa-card-desc {
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+    .coa-card-action {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      color: #FF0000;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="logo">PM <span>/</span> OS</div>
+    <nav class="nav-tabs">
+      <div class="nav-tab">VSM Entry</div>
+      <div class="nav-tab">Action Plan</div>
+      <div class="nav-tab">Living VSM</div>
+      <div class="nav-tab active">Insights</div>
+    </nav>
+  </header>
+
+  <main class="main">
+    <div class="page-header">
+      <div class="page-title">Cross-VSM Insights</div>
+      <div class="page-subtitle">
+        Patterns discovered across all Rise8 customer engagements. These insights scale to Delivery Playbooks.
+      </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value">12</div>
+        <div class="stat-label">VSMs Analyzed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">7</div>
+        <div class="stat-label">Validated Patterns</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">167d</div>
+        <div class="stat-label">Avg Lead Time</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">3</div>
+        <div class="stat-label">Playbook Updates</div>
+      </div>
+    </div>
+
+    <!-- Featured Insight -->
+    <div class="insights-grid">
+      <div class="insight-card featured">
+        <div class="insight-header">
+          <div class="insight-badges">
+            <span class="insight-badge badge-pattern">Pattern</span>
+            <span class="insight-badge badge-validated">Validated</span>
+            <span class="insight-badge badge-playbook">→ Playbook</span>
+          </div>
+        </div>
+        <div class="insight-title">Security/ATO is the universal bottleneck across DoD engagements</div>
+        <div class="insight-desc">
+          Across 12 customer VSMs, Security/ATO stages account for 35-50% of total lead time. Customers with a dedicated InfoSec liaison embedded in the delivery team show 40% shorter security stage lead times compared to those with traditional handoff models.
+        </div>
+        <div class="insight-evidence">
+          <div class="evidence-title">Evidence from 12 VSMs</div>
+          <div class="evidence-grid">
+            <div class="evidence-item">
+              <div class="evidence-value">9 of 12</div>
+              <div class="evidence-label">VSMs with ATO bottleneck</div>
+            </div>
+            <div class="evidence-item">
+              <div class="evidence-value">42%</div>
+              <div class="evidence-label">Avg % of lead time</div>
+            </div>
+            <div class="evidence-item">
+              <div class="evidence-value">-40%</div>
+              <div class="evidence-label">With embedded InfoSec</div>
+            </div>
+          </div>
+        </div>
+        <div class="insight-quote">
+          "When we embedded the SCA into our IPT, decisions that used to take weeks happened in the same room, same day."
+          <div class="quote-source">309th SWAG Stakeholder</div>
+        </div>
+        <div class="insight-actions">
+          <button class="insight-btn insight-btn-primary">Add to Playbooks →</button>
+          <button class="insight-btn insight-btn-secondary">View All Evidence</button>
+          <button class="insight-btn insight-btn-secondary">Share with Leadership</button>
+        </div>
+      </div>
+
+      <!-- Insight 2 -->
+      <div class="insight-card">
+        <div class="insight-header">
+          <div class="insight-badges">
+            <span class="insight-badge badge-pattern">Pattern</span>
+            <span class="insight-badge badge-validated">Validated</span>
+          </div>
+        </div>
+        <div class="insight-title">Waiting waste appears in 100% of VSMs</div>
+        <div class="insight-desc">
+          Every single VSM analyzed contains Waiting as a tagged waste. The most common cause: dependencies on external approvals or handoffs between functional silos.
+        </div>
+        <div class="insight-evidence">
+          <div class="evidence-title">Evidence</div>
+          <div class="evidence-grid">
+            <div class="evidence-item">
+              <div class="evidence-value">12 of 12</div>
+              <div class="evidence-label">VSMs with waiting</div>
+            </div>
+            <div class="evidence-item">
+              <div class="evidence-value">3.2</div>
+              <div class="evidence-label">Avg stages affected</div>
+            </div>
+            <div class="evidence-item">
+              <div class="evidence-value">58%</div>
+              <div class="evidence-label">Lead time from waiting</div>
+            </div>
+          </div>
+        </div>
+        <div class="insight-actions">
+          <button class="insight-btn insight-btn-secondary">View Details →</button>
+        </div>
+      </div>
+
+      <!-- Insight 3 -->
+      <div class="insight-card">
+        <div class="insight-header">
+          <div class="insight-badges">
+            <span class="insight-badge badge-new">New</span>
+          </div>
+        </div>
+        <div class="insight-title">Fastest engagements share 3 common traits</div>
+        <div class="insight-desc">
+          The top 3 fastest engagements (under 100 days lead time) all have: (1) embedded InfoSec, (2) co-located teams, and (3) weekly stakeholder demos. Causation is unconfirmed but correlation is strong.
+        </div>
+        <div class="insight-evidence">
+          <div class="evidence-title">Evidence</div>
+          <div class="evidence-grid">
+            <div class="evidence-item">
+              <div class="evidence-value">92d</div>
+              <div class="evidence-label">Avg lead time (top 3)</div>
+            </div>
+            <div class="evidence-item">
+              <div class="evidence-value">3 of 3</div>
+              <div class="evidence-label">Have all 3 traits</div>
+            </div>
+            <div class="evidence-item">
+              <div class="evidence-value">0 of 9</div>
+              <div class="evidence-label">Others have all 3</div>
+            </div>
+          </div>
+        </div>
+        <div class="insight-actions">
+          <button class="insight-btn insight-btn-secondary">Investigate →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Waste Chart -->
+    <div class="waste-section">
+      <div class="waste-title">Waste Frequency Across All VSMs</div>
+      <div class="waste-chart">
+        <div class="waste-row">
+          <div class="waste-icon">⏳</div>
+          <div class="waste-name">Waiting</div>
+          <div class="waste-bar-container">
+            <div class="waste-bar high" style="width: 100%;">12 of 12 VSMs (100%)</div>
+          </div>
+        </div>
+        <div class="waste-row">
+          <div class="waste-icon">⚙️</div>
+          <div class="waste-name">Extra Processing</div>
+          <div class="waste-bar-container">
+            <div class="waste-bar high" style="width: 75%;">9 of 12 VSMs (75%)</div>
+          </div>
+        </div>
+        <div class="waste-row">
+          <div class="waste-icon">📚</div>
+          <div class="waste-name">Inventory</div>
+          <div class="waste-bar-container">
+            <div class="waste-bar medium" style="width: 58%;">7 of 12 VSMs (58%)</div>
+          </div>
+        </div>
+        <div class="waste-row">
+          <div class="waste-icon">👤</div>
+          <div class="waste-name">Non-utilized Talent</div>
+          <div class="waste-bar-container">
+            <div class="waste-bar medium" style="width: 50%;">6 of 12 VSMs (50%)</div>
+          </div>
+        </div>
+        <div class="waste-row">
+          <div class="waste-icon">🔴</div>
+          <div class="waste-name">Defects</div>
+          <div class="waste-bar-container">
+            <div class="waste-bar low" style="width: 33%;">4 of 12 VSMs (33%)</div>
+          </div>
+        </div>
+        <div class="waste-row">
+          <div class="waste-icon">🏃</div>
+          <div class="waste-name">Motion</div>
+          <div class="waste-bar-container">
+            <div class="waste-bar low" style="width: 25%;">3 of 12 VSMs (25%)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COA Section -->
+    <div class="coa-section">
+      <div class="coa-header">
+        <div class="coa-icon">🎯</div>
+        <div>
+          <div class="coa-title">Courses of Action: Insights</div>
+        </div>
+      </div>
+      
+      <div class="coa-grid">
+        <div class="coa-card">
+          <div class="coa-card-title">COA 1: Propose Embedded InfoSec Pattern</div>
+          <div class="coa-card-desc">
+            The data is strong: 40% reduction in security lead time with embedded InfoSec. Draft a playbook update recommending this staffing pattern for all new engagements.
+          </div>
+          <div class="coa-card-action">Draft Playbook Update →</div>
+        </div>
+        
+        <div class="coa-card">
+          <div class="coa-card-title">COA 2: Share with PM Practice</div>
+          <div class="coa-card-desc">
+            These insights came from Rob's VSM work. Present at the next PM Practice Office Hours to help other PMs recognize these patterns in their engagements.
+          </div>
+          <div class="coa-card-action">Schedule Presentation →</div>
+        </div>
+        
+        <div class="coa-card">
+          <div class="coa-card-title">COA 3: Escalate to Leadership</div>
+          <div class="coa-card-desc">
+            If 100% of VSMs show waiting waste, this is a systemic issue. Package the evidence for leadership to address at the organizational level.
+          </div>
+          <div class="coa-card-action">Create Executive Summary →</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

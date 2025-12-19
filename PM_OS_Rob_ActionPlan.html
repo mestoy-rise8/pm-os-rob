@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PM OS: Transformation Action Plan</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      background: #131414;
+      font-family: 'DM Sans', sans-serif;
+      color: #F2F2F2;
+    }
+    
+    .header {
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #2B2C2C;
+    }
+    .logo { font-size: 20px; font-weight: 700; }
+    .logo span { color: #FF0000; }
+    
+    .nav-tabs {
+      display: flex;
+      gap: 4px;
+      background: #1a1a1a;
+      padding: 4px;
+      border-radius: 8px;
+    }
+    .nav-tab {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #888;
+    }
+    .nav-tab:hover { color: #F2F2F2; }
+    .nav-tab.active {
+      background: #2B2C2C;
+      color: #F2F2F2;
+    }
+    
+    .main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+    
+    /* Page Header */
+    .page-header {
+      margin-bottom: 32px;
+    }
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .page-subtitle {
+      color: #888;
+      font-size: 14px;
+    }
+    
+    /* Stats Row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .stat-card {
+      background: #1a1a1a;
+      border: 1px solid #2B2C2C;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .stat-value.green { color: #22c55e; }
+    .stat-value.yellow { color: #eab308; }
+    .stat-value.red { color: #FF0000; }
+    .stat-value.blue { color: #60a5fa; }
+    .stat-label {
+      font-size: 11px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    /* Kanban Board */
+    .kanban {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    .kanban-column {
+      background: #1a1a1a;
+      border-radius: 12px;
+      padding: 16px;
+      min-height: 500px;
+    }
+    .column-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #2B2C2C;
+    }
+    .column-title {
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .column-count {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #2B2C2C;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Action Card */
+    .action-card {
+      background: #131414;
+      border: 1px solid #2B2C2C;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .action-card:hover {
+      border-color: #444;
+      transform: translateY(-2px);
+    }
+    .action-card.urgent {
+      border-left: 3px solid #FF0000;
+    }
+    .action-card.on-track {
+      border-left: 3px solid #22c55e;
+    }
+    .action-card.at-risk {
+      border-left: 3px solid #eab308;
+    }
+    
+    .action-type {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+    .type-just-do-it {
+      background: rgba(34, 197, 94, 0.15);
+      color: #22c55e;
+    }
+    .type-spike {
+      background: rgba(96, 165, 250, 0.15);
+      color: #60a5fa;
+    }
+    .type-initiative {
+      background: rgba(168, 85, 247, 0.15);
+      color: #a855f7;
+    }
+    .type-journey {
+      background: rgba(234, 179, 8, 0.15);
+      color: #eab308;
+    }
+    
+    .action-title {
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+    .action-constraint {
+      font-size: 11px;
+      color: #888;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+    }
+    .action-constraint::before {
+      content: "🎯";
+      font-size: 10px;
+    }
+    
+    .action-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      color: #666;
+    }
+    .action-owner {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .owner-avatar {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: linear-gradient(78deg, #800031, #FF0000);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      font-weight: 600;
+    }
+    .action-progress {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .progress-bar {
+      width: 40px;
+      height: 4px;
+      background: #2B2C2C;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #22c55e;
+      border-radius: 2px;
+    }
+    
+    /* COA Section */
+    .coa-section {
+      background: linear-gradient(135deg, rgba(255, 0, 0, 0.05), rgba(128, 0, 49, 0.05));
+      border: 1px solid rgba(255, 0, 0, 0.2);
+      border-radius: 16px;
+      padding: 24px;
+      margin-top: 32px;
+    }
+    .coa-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .coa-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(78deg, #800031, #FF0000);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .coa-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .coa-subtitle {
+      font-size: 12px;
+      color: #888;
+    }
+    
+    .coa-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .coa-card {
+      background: #1a1a1a;
+      border: 1px solid #2B2C2C;
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .coa-card:hover {
+      border-color: #FF0000;
+      transform: translateY(-2px);
+    }
+    .coa-card-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .coa-card-desc {
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+    .coa-card-action {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      color: #FF0000;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    /* Add Action Modal Trigger */
+    .add-action-btn {
+      width: 100%;
+      padding: 12px;
+      border: 2px dashed #333;
+      border-radius: 8px;
+      background: transparent;
+      color: #666;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .add-action-btn:hover {
+      border-color: #FF0000;
+      color: #FF0000;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="logo">PM <span>/</span> OS</div>
+    <nav class="nav-tabs">
+      <div class="nav-tab">VSM Entry</div>
+      <div class="nav-tab active">Action Plan</div>
+      <div class="nav-tab">Living VSM</div>
+      <div class="nav-tab">Insights</div>
+    </nav>
+  </header>
+
+  <main class="main">
+    <div class="page-header">
+      <div class="page-title">Transformation Action Plan: 309th SWEG</div>
+      <div class="page-subtitle">
+        Tracking initiatives from VSM analysis to outcomes in prod. Based on Rob's charter template structure.
+      </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value">8</div>
+        <div class="stat-label">Total Actions</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value green">3</div>
+        <div class="stat-label">On Track</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value yellow">2</div>
+        <div class="stat-label">At Risk</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value blue">45%</div>
+        <div class="stat-label">Overall Progress</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value red">-21d</div>
+        <div class="stat-label">Lead Time Impact</div>
+      </div>
+    </div>
+
+    <!-- Kanban Board -->
+    <div class="kanban">
+      <!-- Backlog -->
+      <div class="kanban-column">
+        <div class="column-header">
+          <div class="column-title">
+            Backlog
+            <span class="column-count">2</span>
+          </div>
+        </div>
+        
+        <div class="action-card">
+          <span class="action-type type-journey">User Journey</span>
+          <div class="action-title">Map aircraft maintenance request flow</div>
+          <div class="action-constraint">Understand handoff delays between Program Office and Engineering</div>
+          <div class="action-meta">
+            <div class="action-owner">
+              <div class="owner-avatar">?</div>
+              Unassigned
+            </div>
+          </div>
+        </div>
+        
+        <div class="action-card">
+          <span class="action-type type-initiative">Initiative</span>
+          <div class="action-title">Implement automated status notifications</div>
+          <div class="action-constraint">Reduce waiting waste by eliminating manual status checks</div>
+          <div class="action-meta">
+            <div class="action-owner">
+              <div class="owner-avatar">?</div>
+              Unassigned
+            </div>
+          </div>
+        </div>
+        
+        <button class="add-action-btn">+ Add Action</button>
+      </div>
+
+      <!-- In Progress -->
+      <div class="kanban-column">
+        <div class="column-header">
+          <div class="column-title">
+            In Progress
+            <span class="column-count">3</span>
+          </div>
+        </div>
+        
+        <div class="action-card on-track">
+          <span class="action-type type-spike">Spike</span>
+          <div class="action-title">Can we integrate with existing JIRA for requirements tracking?</div>
+          <div class="action-constraint">Test feasibility of replacing manual intake process</div>
+          <div class="action-meta">
+            <div class="action-owner">
+              <div class="owner-avatar">AG</div>
+              Adam G.
+            </div>
+            <div class="action-progress">
+              <div class="progress-bar"><div class="progress-fill" style="width: 70%;"></div></div>
+              70%
+            </div>
+          </div>
+        </div>
+        
+        <div class="action-card at-risk">
+          <span class="action-type type-initiative">Initiative</span>
+          <div class="action-title">Establish weekly review board cadence</div>
+          <div class="action-constraint">Reduce queue time from 21 days to 7 days</div>
+          <div class="action-meta">
+            <div class="action-owner">
+              <div class="owner-avatar">RM</div>
+              Rob M.
+            </div>
+            <div class="action-progress">
+              <div class="progress-bar"><div class="progress-fill" style="width: 30%; background: #eab308;"></div></div>
+              30%
+            </div>
+          </div>
+        </div>
+        
+        <div class="action-card on-track">
+          <span class="action-type type-just-do-it">Just Do It</span>
+          <div class="action-title">Create shared Slack channel for status updates</div>
+          <div class="action-constraint">Eliminate waiting for email responses</div>
+          <div class="action-meta">
+            <div class="action-owner">
+              <div class="owner-avatar">KG</div>
+              Kevin G.
+            </div>
+            <div class="action-progress">
+              <div class="progress-bar"><div class="progress-fill" style="width: 90%;"></div></div>
+              90%
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Review -->
+      <div class="kanban-column">
+        <div class="column-header">
+          <div class="column-title">
+            Review
+            <span class="column-count">1</span>
+          </div>
+        </div>
+        
+        <div class="action-card on-track">
+          <span class="action-type type-spike">Spike</span>
+          <div class="action-title">Prototype: Requirements intake form</div>
+          <div class="action-constraint">Validate that structured intake reduces rework</div>
+          <div class="action-meta">
+            <div class="action-owner">
+              <div class="owner-avatar">DC</div>
+              David C.
+            </div>
+            <div class="action-progress">
+              <div class="progress-bar"><div class="progress-fill" style="width: 100%;"></div></div>
+              100%
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Done -->
+      <div class="kanban-column">
+        <div class="column-header">
+          <div class="column-title">
+            Done ✓
+            <span class="column-count">2</span>
+          </div>
+        </div>
+        
+        <div class="action-card" style="opacity: 0.7;">
+          <span class="action-type type-just-do-it">Just Do It</span>
+          <div class="action-title">Document current state VSM</div>
+          <div class="action-constraint">Baseline for measuring improvements</div>
+          <div class="action-meta">
+            <div class="action-owner">
+              <div class="owner-avatar">RM</div>
+              Rob M.
+            </div>
+            <div style="color: #22c55e;">✓ Complete</div>
+          </div>
+        </div>
+        
+        <div class="action-card" style="opacity: 0.7;">
+          <span class="action-type type-just-do-it">Just Do It</span>
+          <div class="action-title">Identify key stakeholders for review board</div>
+          <div class="action-constraint">Ensure right people in room for decisions</div>
+          <div class="action-meta">
+            <div class="action-owner">
+              <div class="owner-avatar">RM</div>
+              Rob M.
+            </div>
+            <div style="color: #22c55e;">✓ Complete</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COA Section -->
+    <div class="coa-section">
+      <div class="coa-header">
+        <div class="coa-icon">🎯</div>
+        <div>
+          <div class="coa-title">Courses of Action for Rob</div>
+          <div class="coa-subtitle">Based on your VSM data and current action plan status</div>
+        </div>
+      </div>
+      
+      <div class="coa-grid">
+        <div class="coa-card">
+          <div class="coa-card-title">COA 1: Address the Review Board Bottleneck</div>
+          <div class="coa-card-desc">
+            Your VSM shows 21 days lead time at Requirements Intake with only 2 days process time. The "At Risk" initiative to establish weekly cadence would cut this by 14 days.
+          </div>
+          <div class="coa-card-action">Escalate to Leadership →</div>
+        </div>
+        
+        <div class="coa-card">
+          <div class="coa-card-title">COA 2: Ship the Quick Win</div>
+          <div class="coa-card-desc">
+            The Slack channel action is at 90%. Completing it today would immediately reduce waiting waste and demonstrate momentum to stakeholders.
+          </div>
+          <div class="coa-card-action">Mark Complete →</div>
+        </div>
+        
+        <div class="coa-card">
+          <div class="coa-card-title">COA 3: Assign the User Journey</div>
+          <div class="coa-card-desc">
+            The unassigned User Journey mapping would give deeper insight into handoff delays. Consider pairing with a designer for fresh perspective.
+          </div>
+          <div class="coa-card-action">Find Owner →</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
