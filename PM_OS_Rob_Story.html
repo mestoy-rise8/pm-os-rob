@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    
+
     body {
       min-height: 100vh;
       background: #131414;
@@ -15,8 +15,7 @@
       color: #F2F2F2;
       overflow-x: hidden;
     }
-    
-    /* Landing Screen */
+
     .landing {
       min-height: 100vh;
       display: flex;
@@ -26,21 +25,21 @@
       padding: 40px;
       text-align: center;
     }
-    
+
     .greeting {
       font-size: 48px;
       font-weight: 700;
       margin-bottom: 16px;
       animation: fadeInUp 0.8s ease;
     }
-    
+
     .subgreeting {
       font-size: 20px;
       color: #888;
       margin-bottom: 48px;
       animation: fadeInUp 0.8s ease 0.2s both;
     }
-    
+
     .google-btn {
       display: flex;
       align-items: center;
@@ -58,53 +57,57 @@
       animation: fadeInUp 0.8s ease 0.4s both;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
-    
+
     .google-btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 24px rgba(0,0,0,0.4);
     }
-    
+
     .google-btn svg {
       width: 24px;
       height: 24px;
     }
-    
+
     .fine-print {
       margin-top: 24px;
       font-size: 12px;
       color: #666;
       animation: fadeInUp 0.8s ease 0.6s both;
     }
-    
-    /* Story Container */
+
     .story-container {
       display: none;
-      min-height: 100vh;
     }
-    
+
     .story-container.active {
       display: block;
     }
-    
-    /* Scene */
+
     .scene {
       min-height: 100vh;
-      display: flex;
+      display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 60px 40px;
-      opacity: 0;
-      transform: translateY(40px);
-      transition: all 0.6s ease;
-      position: relative;
+      text-align: center;
     }
-    
+
     .scene.visible {
-      opacity: 1;
-      transform: translateY(0);
+      display: flex;
+      animation: fadeIn 0.5s ease;
     }
-    
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .scene-number {
       position: absolute;
       top: 24px;
@@ -113,181 +116,34 @@
       font-size: 12px;
       color: #444;
     }
-    
-    /* Avatar */
-    .avatar {
-      width: 200px;
-      height: 200px;
-      border-radius: 50%;
+
+    .scene-emoji {
+      font-size: 120px;
       margin-bottom: 32px;
-      position: relative;
-      overflow: hidden;
     }
-    
-    .avatar.rob {
-      background: linear-gradient(135deg, #2B2C2C, #1a1a1a);
-      border: 4px solid #FF0000;
-    }
-    
-    .avatar.michael {
-      background: linear-gradient(135deg, #8B4513, #654321);
-      border: 4px solid #60a5fa;
-    }
-    
-    .avatar-inner {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 80px;
-    }
-    
-    /* Visual Elements */
-    .visual {
-      width: 100%;
-      max-width: 600px;
-      height: 300px;
-      margin-bottom: 32px;
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .visual.figjam {
-      background: linear-gradient(135deg, #FEF3C7, #FDE68A);
-    }
-    
-    .visual.trapped {
-      background: linear-gradient(135deg, #1a1a1a, #2B2C2C);
-      border: 2px solid #444;
-    }
-    
-    .visual.bridge {
-      background: linear-gradient(90deg, #FDE68A 0%, #a855f7 50%, #60a5fa 100%);
-    }
-    
-    .visual.stats {
-      background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05));
-      border: 2px solid rgba(34, 197, 94, 0.3);
-    }
-    
-    .visual.collab {
-      background: linear-gradient(135deg, rgba(255, 0, 0, 0.1), rgba(128, 0, 49, 0.05));
-      border: 2px solid rgba(255, 0, 0, 0.3);
-    }
-    
-    /* Sticky Notes */
-    .sticky-notes {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      justify-content: center;
-      padding: 20px;
-    }
-    
-    .sticky {
-      width: 80px;
-      height: 80px;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      text-align: center;
-      color: #333;
-      transform: rotate(var(--rotate, 0deg));
-      animation: stickyPop 0.4s ease calc(var(--delay, 0) * 0.1s) both;
-    }
-    
-    .sticky.yellow { background: #FEF08A; }
-    .sticky.pink { background: #FBCFE8; }
-    .sticky.blue { background: #BAE6FD; }
-    .sticky.green { background: #BBF7D0; }
-    .sticky.orange { background: #FED7AA; }
-    
-    @keyframes stickyPop {
-      from { opacity: 0; transform: scale(0) rotate(var(--rotate, 0deg)); }
-      to { opacity: 1; transform: scale(1) rotate(var(--rotate, 0deg)); }
-    }
-    
-    /* Cage */
-    .cage {
-      width: 200px;
-      height: 200px;
-      position: relative;
-    }
-    
-    .cage-bar {
-      position: absolute;
-      width: 8px;
-      height: 100%;
-      background: #444;
-      border-radius: 4px;
-    }
-    
-    .cage-content {
-      position: absolute;
-      inset: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0.5;
-    }
-    
-    /* Text */
+
     .scene-text {
-      font-size: 32px;
+      font-size: 36px;
       font-weight: 700;
-      text-align: center;
       max-width: 700px;
       line-height: 1.4;
       margin-bottom: 24px;
     }
-    
+
     .scene-subtext {
       font-size: 18px;
       color: #888;
-      text-align: center;
       max-width: 500px;
+      line-height: 1.6;
     }
-    
+
     .highlight {
       background: linear-gradient(78deg, #FF0000, #a855f7);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-    
-    .stat-big {
-      font-size: 72px;
-      font-weight: 700;
-      color: #22c55e;
-      margin-bottom: 16px;
-    }
-    
-    /* Navigation */
-    .nav-hint {
-      position: fixed;
-      bottom: 32px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-      color: #666;
-      animation: bounce 2s ease infinite;
-    }
-    
-    @keyframes bounce {
-      0%, 100% { transform: translateX(-50%) translateY(0); }
-      50% { transform: translateX(-50%) translateY(-8px); }
-    }
-    
-    /* Progress */
+
     .progress {
       position: fixed;
       top: 0;
@@ -295,16 +151,24 @@
       height: 4px;
       background: linear-gradient(90deg, #FF0000, #a855f7);
       transition: width 0.3s ease;
+      z-index: 100;
     }
-    
-    /* CTA */
-    .cta-section {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
+
+    .nav-hint {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 14px;
+      color: #666;
+      animation: pulse 2s ease infinite;
     }
-    
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
     .cta-btn {
       display: inline-block;
       padding: 20px 48px;
@@ -318,76 +182,78 @@
       letter-spacing: 1px;
       text-decoration: none;
       transition: all 0.2s;
-      animation: pulse 2s ease infinite;
+      margin-top: 24px;
     }
-    
+
     .cta-btn:hover {
       transform: translateY(-4px);
       box-shadow: 0 12px 32px rgba(255, 0, 0, 0.4);
     }
-    
-    @keyframes pulse {
-      0%, 100% { box-shadow: 0 4px 16px rgba(255, 0, 0, 0.3); }
-      50% { box-shadow: 0 4px 32px rgba(255, 0, 0, 0.5); }
-    }
-    
-    /* Animations */
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    /* Dual Avatar */
-    .dual-avatar {
-      display: flex;
-      gap: 32px;
-      margin-bottom: 32px;
-    }
-    
-    .dual-avatar .avatar {
-      width: 150px;
-      height: 150px;
-    }
-    
-    .dual-avatar .avatar-inner {
-      font-size: 60px;
-    }
-    
-    /* Bridge Visual */
-    .bridge-flow {
+
+    .visual-box {
+      width: 400px;
+      height: 200px;
+      border-radius: 16px;
       display: flex;
       align-items: center;
-      gap: 16px;
-      padding: 24px;
+      justify-content: center;
+      margin-bottom: 32px;
+      font-size: 48px;
     }
-    
-    .bridge-node {
-      padding: 16px 24px;
-      border-radius: 12px;
-      font-weight: 600;
-      font-size: 14px;
+
+    .visual-box.figjam {
+      background: linear-gradient(135deg, #FEF3C7, #FDE68A);
     }
-    
-    .bridge-node.figjam { background: #FEF08A; color: #333; }
-    .bridge-node.pmos { background: #a855f7; color: white; }
-    .bridge-node.claude { background: #60a5fa; color: white; }
-    
-    .bridge-arrow {
+
+    .visual-box.trapped {
+      background: #1a1a1a;
+      border: 3px dashed #444;
+    }
+
+    .visual-box.bridge {
+      background: linear-gradient(90deg, #FDE68A, #a855f7, #60a5fa);
+      color: white;
       font-size: 24px;
-      color: #666;
+      font-weight: 700;
+    }
+
+    .visual-box.stats {
+      background: rgba(34, 197, 94, 0.1);
+      border: 2px solid rgba(34, 197, 94, 0.3);
+      flex-direction: column;
+    }
+
+    .stat-number {
+      font-size: 64px;
+      font-weight: 700;
+      color: #22c55e;
+    }
+
+    .stat-label {
+      font-size: 16px;
+      color: #888;
+    }
+
+    .dual-emoji {
+      display: flex;
+      gap: 40px;
+      margin-bottom: 32px;
+    }
+
+    .dual-emoji span {
+      font-size: 80px;
     }
   </style>
 </head>
 <body>
 
-  <!-- Progress Bar -->
   <div class="progress" id="progress"></div>
 
   <!-- Landing Screen -->
   <div class="landing" id="landing">
     <div class="greeting">Hey Rob! 👋🏾</div>
     <div class="subgreeting">I made something for you. Got 60 seconds?</div>
-    
+
     <button class="google-btn" id="start-btn">
       <svg viewBox="0 0 24 24">
         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -397,164 +263,108 @@
       </svg>
       Continue with Google
     </button>
-    
+
     <div class="fine-print">This is actually just a story. No auth required. 😉</div>
   </div>
 
   <!-- Story Container -->
   <div class="story-container" id="story">
-    
-    <!-- Scene 1: Title -->
+
+    <!-- Scene 1 -->
     <div class="scene" data-scene="1">
-      <div class="scene-number">1 / 12</div>
-      <div style="font-size: 120px; margin-bottom: 24px;">📖</div>
+      <div class="scene-emoji">📖</div>
       <div class="scene-text">A <span class="highlight">Rise8</span> Story</div>
       <div class="scene-subtext">About trapped knowledge, living maps, and an unexpected collaboration</div>
     </div>
-    
-    <!-- Scene 2: Rob Introduction -->
+
+    <!-- Scene 2 -->
     <div class="scene" data-scene="2">
-      <div class="scene-number">2 / 12</div>
-      <div class="avatar rob">
-        <div class="avatar-inner">👨‍💼</div>
-      </div>
+      <div class="scene-emoji">👨‍💼</div>
       <div class="scene-text">Rob runs <span class="highlight">killer</span> VSM workshops.</div>
       <div class="scene-subtext">You know the kind. Stakeholders leave energized. Breakthroughs happen.</div>
     </div>
-    
-    <!-- Scene 3: FigJam Full -->
+
+    <!-- Scene 3 -->
     <div class="scene" data-scene="3">
-      <div class="scene-number">3 / 12</div>
-      <div class="visual figjam">
-        <div class="sticky-notes">
-          <div class="sticky yellow" style="--rotate: -3deg; --delay: 0;">Requirements</div>
-          <div class="sticky pink" style="--rotate: 2deg; --delay: 1;">ATO Review</div>
-          <div class="sticky blue" style="--rotate: -1deg; --delay: 2;">45 days 😱</div>
-          <div class="sticky green" style="--rotate: 4deg; --delay: 3;">Deploy</div>
-          <div class="sticky orange" style="--rotate: -2deg; --delay: 4;">Bottleneck!</div>
-          <div class="sticky yellow" style="--rotate: 1deg; --delay: 5;">Waiting...</div>
-          <div class="sticky pink" style="--rotate: -4deg; --delay: 6;">Build</div>
-          <div class="sticky blue" style="--rotate: 3deg; --delay: 7;">Test</div>
-        </div>
-      </div>
+      <div class="visual-box figjam">📝📊📋🗂️</div>
       <div class="scene-text">FigJam boards overflow with insights.</div>
       <div class="scene-subtext">3-pass approach. 8 forms of waste. Everything captured beautifully.</div>
     </div>
-    
-    <!-- Scene 4: But Then... -->
+
+    <!-- Scene 4 -->
     <div class="scene" data-scene="4">
-      <div class="scene-number">4 / 12</div>
-      <div class="avatar rob" style="opacity: 0.5;">
-        <div class="avatar-inner">🤔</div>
-      </div>
+      <div class="scene-emoji" style="opacity: 0.4;">🤔</div>
       <div class="scene-text">But after the workshop high fades...</div>
       <div class="scene-subtext">Something gnaws at him.</div>
     </div>
-    
-    <!-- Scene 5: Trapped -->
+
+    <!-- Scene 5 -->
     <div class="scene" data-scene="5">
-      <div class="scene-number">5 / 12</div>
-      <div class="visual trapped">
-        <div class="cage">
-          <div class="cage-bar" style="left: 0;"></div>
-          <div class="cage-bar" style="left: 25%;"></div>
-          <div class="cage-bar" style="left: 50%;"></div>
-          <div class="cage-bar" style="left: 75%;"></div>
-          <div class="cage-bar" style="right: 0;"></div>
-          <div class="cage-content">📊</div>
-        </div>
-      </div>
+      <div class="visual-box trapped">🔒 📊 🔒</div>
       <div class="scene-text">All that knowledge sits <span class="highlight">trapped</span>.</div>
       <div class="scene-subtext">Saved to a folder. Occasionally opened. Mostly waiting.</div>
     </div>
-    
-    <!-- Scene 6: What If -->
+
+    <!-- Scene 6 -->
     <div class="scene" data-scene="6">
-      <div class="scene-number">6 / 12</div>
-      <div class="avatar rob">
-        <div class="avatar-inner">💭</div>
-      </div>
+      <div class="scene-emoji">💭</div>
       <div class="scene-text">"What if it could <span class="highlight">keep working</span>?"</div>
       <div class="scene-subtext">What if the data didn't have to stay dormant?</div>
     </div>
-    
-    <!-- Scene 7: Enter Michael -->
+
+    <!-- Scene 7 -->
     <div class="scene" data-scene="7">
-      <div class="scene-number">7 / 12</div>
-      <div class="avatar michael">
-        <div class="avatar-inner">👋🏾</div>
-      </div>
+      <div class="scene-emoji">👋🏾</div>
       <div class="scene-text">Hey! I'm <span class="highlight">Michael</span>.</div>
       <div class="scene-subtext">I was working on the same problem. Without knowing you were too.</div>
     </div>
-    
-    <!-- Scene 8: The Bridge -->
+
+    <!-- Scene 8 -->
     <div class="scene" data-scene="8">
-      <div class="scene-number">8 / 12</div>
-      <div class="visual bridge">
-        <div class="bridge-flow">
-          <div class="bridge-node figjam">FigJam</div>
-          <div class="bridge-arrow">→</div>
-          <div class="bridge-node pmos">PM OS</div>
-          <div class="bridge-arrow">→</div>
-          <div class="bridge-node claude">Claude</div>
-        </div>
-      </div>
+      <div class="visual-box bridge">FigJam → PM OS → Claude</div>
       <div class="scene-text">I built a <span class="highlight">bridge</span>.</div>
       <div class="scene-subtext">Your VSM data goes in structured. Claude sees patterns across ALL engagements.</div>
     </div>
-    
-    <!-- Scene 9: Stats -->
+
+    <!-- Scene 9 -->
     <div class="scene" data-scene="9">
-      <div class="scene-number">9 / 12</div>
-      <div class="visual stats">
-        <div class="stat-big">9 of 12</div>
+      <div class="visual-box stats">
+        <div class="stat-number">9 of 12</div>
+        <div class="stat-label">VSMs show ATO as the bottleneck</div>
       </div>
-      <div class="scene-text">VSMs show ATO as the bottleneck.</div>
-      <div class="scene-subtext">That's not a hunch. That's a pattern. Actionable. Playbook-worthy.</div>
+      <div class="scene-text">That's not a hunch. That's a <span class="highlight">pattern</span>.</div>
+      <div class="scene-subtext">Actionable. Playbook-worthy. Discovered by AI.</div>
     </div>
-    
-    <!-- Scene 10: Living Map -->
+
+    <!-- Scene 10 -->
     <div class="scene" data-scene="10">
-      <div class="scene-number">10 / 12</div>
-      <div style="font-size: 100px; margin-bottom: 24px;">🗺️✨</div>
+      <div class="scene-emoji">🗺️✨</div>
       <div class="scene-text">The map comes <span class="highlight">alive</span>.</div>
       <div class="scene-subtext">Baseline → Current → Target. Not a snapshot. A journey.</div>
     </div>
-    
-    <!-- Scene 11: Together -->
+
+    <!-- Scene 11 -->
     <div class="scene" data-scene="11">
-      <div class="scene-number">11 / 12</div>
-      <div class="dual-avatar">
-        <div class="avatar rob">
-          <div class="avatar-inner">👨‍💼</div>
-        </div>
-        <div class="avatar michael">
-          <div class="avatar-inner">👨🏽‍💻</div>
-        </div>
+      <div class="dual-emoji">
+        <span>👨‍💼</span>
+        <span>👨🏽‍💻</span>
       </div>
       <div class="scene-text">You built the workshop.<br>I built the operating system.</div>
       <div class="scene-subtext">Convergence. We arrived at the same place from different directions.</div>
     </div>
-    
-    <!-- Scene 12: CTA -->
+
+    <!-- Scene 12 -->
     <div class="scene" data-scene="12">
-      <div class="scene-number">12 / 12</div>
-      <div class="visual collab">
-        <div style="font-size: 80px;">🤝</div>
-      </div>
+      <div class="scene-emoji">🤝</div>
       <div class="scene-text">Let's build something <span class="highlight">together</span>.</div>
-      <div class="cta-section">
-        <a href="PM_OS_Rob_Welcome.html" class="cta-btn">Explore PM OS →</a>
-        <div class="scene-subtext">~10 minutes to explore. Your VSM workflow, digitized.</div>
-      </div>
+      <div class="scene-subtext">~10 minutes to explore. Your VSM workflow, digitized.</div>
+      <a href="PM_OS_Rob_Welcome.html" class="cta-btn">Explore PM OS →</a>
     </div>
-    
+
   </div>
 
-  <!-- Navigation Hint -->
   <div class="nav-hint" id="nav-hint" style="display: none;">
-    Press <strong>Space</strong> or <strong>→</strong> to continue
+    Press Space or → to continue
   </div>
 
   <script>
@@ -564,34 +374,38 @@
     const progress = document.getElementById('progress');
     const navHint = document.getElementById('nav-hint');
     const scenes = document.querySelectorAll('.scene');
-    
+
     let currentScene = 0;
     const totalScenes = scenes.length;
-    
-    // Start story
-    startBtn.addEventListener('click', () => {
+
+    startBtn.addEventListener('click', function() {
       landing.style.display = 'none';
       story.classList.add('active');
-      navHint.style.display = 'flex';
+      navHint.style.display = 'block';
       showScene(0);
     });
-    
-    // Show scene
+
     function showScene(index) {
-      scenes.forEach((scene, i) => {
-        scene.classList.toggle('visible', i === index);
-      });
+      for (let i = 0; i < scenes.length; i++) {
+        if (i === index) {
+          scenes[i].classList.add('visible');
+        } else {
+          scenes[i].classList.remove('visible');
+        }
+      }
       currentScene = index;
       progress.style.width = ((index + 1) / totalScenes * 100) + '%';
-      
-      // Hide nav hint on last scene
-      navHint.style.display = index === totalScenes - 1 ? 'none' : 'flex';
+
+      if (index === totalScenes - 1) {
+        navHint.style.display = 'none';
+      } else {
+        navHint.style.display = 'block';
+      }
     }
-    
-    // Keyboard navigation
-    document.addEventListener('keydown', (e) => {
+
+    document.addEventListener('keydown', function(e) {
       if (!story.classList.contains('active')) return;
-      
+
       if (e.code === 'Space' || e.code === 'ArrowRight') {
         e.preventDefault();
         if (currentScene < totalScenes - 1) {
@@ -604,9 +418,8 @@
         }
       }
     });
-    
-    // Click navigation
-    story.addEventListener('click', (e) => {
+
+    story.addEventListener('click', function(e) {
       if (e.target.closest('.cta-btn')) return;
       if (currentScene < totalScenes - 1) {
         showScene(currentScene + 1);
